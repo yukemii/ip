@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -25,8 +27,7 @@ public class Sheppy {
         System.out.println("Baa-hello! I'm Sheppy, your woolly little helper.");
         System.out.println("What shall we graze on today?");
 
-        Task[] tasks = new Task[100];
-        int taskCount = 0;
+        List<Task> tasks = new ArrayList<>();
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNextLine()) {
             String command = scanner.nextLine();
@@ -37,22 +38,24 @@ public class Sheppy {
                 }
                 if (command.equals("list")) {
                     System.out.println("Here are the tasks in your list:");
-                    for (int i = 0; i < taskCount; i++) {
-                        System.out.println((i + 1) + "." + tasks[i]);
+                    for (int i = 0; i < tasks.size(); i++) {
+                        System.out.println((i + 1) + "." + tasks.get(i));
                     }
                 } else if (command.equals("mark") || command.startsWith("mark ")) {
-                    updateTaskStatus(command, tasks, taskCount, true);
+                    updateTaskStatus(command, tasks, true);
                 } else if (command.equals("unmark") || command.startsWith("unmark ")) {
-                    updateTaskStatus(command, tasks, taskCount, false);
+                    updateTaskStatus(command, tasks, false);
+                } else if (command.equals("delete") || command.startsWith("delete ")) {
+                    deleteTask(command, tasks);
                 } else if (command.equals("todo") || command.startsWith("todo ")) {
-                    taskCount = addTask(new Todo(command.substring(4).trim()), tasks, taskCount);
+                    addTask(new Todo(command.substring(4).trim()), tasks);
                 } else if (command.equals("deadline") || command.startsWith("deadline ")) {
-                    taskCount = addDeadline(command, tasks, taskCount);
+                    addDeadline(command, tasks);
                 } else if (command.equals("event") || command.startsWith("event ")) {
-                    taskCount = addEvent(command, tasks, taskCount);
+                    addEvent(command, tasks);
                 } else {
                     throw new SheppyException(
-                            "I don't recognize that command. Try todo, deadline, event, list, mark, or unmark.");
+                            "I don't recognize that command. Try todo, deadline, event, list, mark, unmark, or delete.");
                 }
             } catch (SheppyException exception) {
                 System.out.println("Baa-error: " + exception.getMessage());
@@ -61,20 +64,15 @@ public class Sheppy {
     }
 
     /** Adds a task to the list and reports the new total. */
-    private static int addTask(Task task, Task[] tasks, int taskCount) throws SheppyException {
-        if (taskCount >= tasks.length) {
-            throw new SheppyException("your task list is full.");
-        }
-        tasks[taskCount] = task;
-        taskCount++;
+    private static void addTask(Task task, List<Task> tasks) {
+        tasks.add(task);
         System.out.println("Got it. I've added this task:");
         System.out.println("  " + task);
-        System.out.println("Now you have " + taskCount + " tasks in the list.");
-        return taskCount;
+        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
     }
 
     /** Parses and adds a deadline command. */
-    private static int addDeadline(String command, Task[] tasks, int taskCount)
+    private static void addDeadline(String command, List<Task> tasks)
             throws SheppyException {
         String details = command.substring("deadline ".length());
         int separator = details.indexOf(" /by ");
@@ -83,11 +81,11 @@ public class Sheppy {
         }
         String description = details.substring(0, separator).trim();
         String by = details.substring(separator + " /by ".length()).trim();
-        return addTask(new Deadline(description, by), tasks, taskCount);
+        addTask(new Deadline(description, by), tasks);
     }
 
     /** Parses and adds an event command. */
-    private static int addEvent(String command, Task[] tasks, int taskCount)
+    private static void addEvent(String command, List<Task> tasks)
             throws SheppyException {
         String details = command.substring("event ".length());
         int fromSeparator = details.indexOf(" /from ");
@@ -98,18 +96,17 @@ public class Sheppy {
         String description = details.substring(0, fromSeparator).trim();
         String from = details.substring(fromSeparator + " /from ".length(), toSeparator).trim();
         String to = details.substring(toSeparator + " /to ".length()).trim();
-        return addTask(new Event(description, from, to), tasks, taskCount);
+        addTask(new Event(description, from, to), tasks);
     }
 
     /**
      * Updates a task's completion status based on a mark or unmark command.
      *
      * @param command the complete command entered by the user
-     * @param tasks the current task array
-     * @param taskCount the number of stored tasks
+     * @param tasks the current task list
      * @param markDone whether the task should be marked done
     */
-    private static void updateTaskStatus(String command, Task[] tasks, int taskCount,
+    private static void updateTaskStatus(String command, List<Task> tasks,
                                          boolean markDone) throws SheppyException {
         String[] parts = command.trim().split("\\s+");
         if (parts.length != 2) {
@@ -122,11 +119,11 @@ public class Sheppy {
         } catch (NumberFormatException exception) {
             throw new SheppyException("the task number must be a whole number.");
         }
-        if (taskNumber < 1 || taskNumber > taskCount) {
+        if (taskNumber < 1 || taskNumber > tasks.size()) {
             throw new SheppyException("that task number is not in your list.");
         }
 
-        Task task = tasks[taskNumber - 1];
+        Task task = tasks.get(taskNumber - 1);
         if (markDone) {
             task.markAsDone();
             System.out.println("Nice! I've marked this task as done:");
@@ -135,5 +132,28 @@ public class Sheppy {
             System.out.println("OK, I've marked this task as not done yet:");
         }
         System.out.println("  " + task);
+    }
+
+    /** Deletes a task and reports the remaining total. */
+    private static void deleteTask(String command, List<Task> tasks) throws SheppyException {
+        String[] parts = command.trim().split("\\s+");
+        if (parts.length != 2) {
+            throw new SheppyException("use delete followed by a task number, such as delete 2.");
+        }
+
+        int taskNumber;
+        try {
+            taskNumber = Integer.parseInt(parts[1]);
+        } catch (NumberFormatException exception) {
+            throw new SheppyException("the task number must be a whole number.");
+        }
+        if (taskNumber < 1 || taskNumber > tasks.size()) {
+            throw new SheppyException("that task number is not in your list.");
+        }
+
+        Task deletedTask = tasks.remove(taskNumber - 1);
+        System.out.println("Noted. I've removed this task:");
+        System.out.println("  " + deletedTask);
+        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
     }
 }

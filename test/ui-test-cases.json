@@ -39,5 +39,25 @@
       "Baa-error: the task number must be a whole number.",
       "1.[T][ ] read book"
     ]
+  },
+  {
+    "name": "Delete tasks and renumber",
+    "input": [
+      "todo first task",
+      "todo second task",
+      "todo third task",
+      "mark 2",
+      "delete 1",
+      "list",
+      "delete x",
+      "bye"
+    ],
+    "expected": [
+      "Noted. I've removed this task:",
+      "  [T][ ] first task",
+      "1.[T][X] second task",
+      "2.[T][ ] third task",
+      "Baa-error: the task number must be a whole number."
+    ]
   }
 ]

@@ -25,3 +25,11 @@ The cases in `test/ui-test-cases.json` are run with the project-specific
   `mark x`, `list`, `bye`.
 - Expected: specific `Baa-error:` messages, followed by a list containing only
   `read book`.
+
+## Delete tasks
+
+- Aim: remove a task and confirm that the remaining tasks are renumbered.
+- Input: add three tasks, mark the second task, delete the first task, list,
+  and attempt `delete x`.
+- Expected: the removed task is reported with its current status, the former
+  second task becomes task 1, and the invalid delete produces a `Baa-error:`.
