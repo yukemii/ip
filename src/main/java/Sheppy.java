@@ -1,11 +1,13 @@
+import java.util.Scanner;
+
 /**
  * A simple text-based personal assistant named Sheppy.
  *
- * <p>For Level 0, Sheppy greets the user and exits immediately.</p>
+ * <p>Sheppy echoes commands until the user asks it to leave.</p>
  */
 public class Sheppy {
     /**
-     * Greets the user and exits.
+     * Runs Sheppy's greeting, command-echoing loop, and exit command.
      *
      * @param args command-line arguments, which are not used
      */
@@ -21,6 +23,15 @@ public class Sheppy {
         System.out.println(banner);
         System.out.println("Baa-hello! I'm Sheppy, your woolly little helper.");
         System.out.println("What shall we graze on today?");
-        System.out.println("Baa-bye! Keep your thoughts cozy and your tasks tidy.");
+
+        Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNextLine()) {
+            String command = scanner.nextLine();
+            if (command.equals("bye")) {
+                System.out.println("Baa-bye! Keep your thoughts cozy and your tasks tidy.");
+                return;
+            }
+            System.out.println("Sheppy echoes: " + command);
+        }
     }
 }
