@@ -1,6 +1,4 @@
-/**
- * Represents one task in Sheppy's task list.
- */
+/** Represents a task in Sheppy's task list. */
 public class Task {
     /** The text describing this task. */
     private final String description;
@@ -44,5 +42,34 @@ public class Task {
      */
     public String getDescription() {
         return description;
+    }
+
+    /**
+     * Returns the type marker shown for this task.
+     *
+     * @return the task type marker
+     */
+    public String getTypeIcon() {
+        return "T";
+    }
+
+    /**
+     * Returns the task's complete display description.
+     *
+     * @return the display description
+     */
+    public String getDisplayDescription() {
+        return description;
+    }
+
+    /**
+     * Returns the task in the format used by the user interface.
+     *
+     * @return the formatted task
+     */
+    @Override
+    public String toString() {
+        return "[" + getTypeIcon() + "][" + getStatusIcon() + "] "
+                + getDisplayDescription();
     }
 }

@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Level 4 task types",
+    "input": [
+      "todo borrow book",
+      "deadline submit report /by Friday 5pm",
+      "event project meeting /from Monday 2pm /to 4pm",
+      "list",
+      "bye"
+    ],
+    "expected": [
+      "[T][ ] borrow book",
+      "[D][ ] submit report (by: Friday 5pm)",
+      "[E][ ] project meeting (from: Monday 2pm to: 4pm)"
+    ]
+  },
+  {
+    "name": "Mark and unmark",
+    "input": ["todo read book", "mark 1", "list", "unmark 1", "list", "bye"],
+    "expected": ["[T][X] read book", "[T][ ] read book"]
+  }
+]

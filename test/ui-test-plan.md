@@ -1,0 +1,18 @@
+# Sheppy UI test plan
+
+The cases in `test/ui-test-cases.json` are run with the project-specific
+`.codex/skills/test-ui/scripts/run_ui_tests.py` script.
+
+## Level 4 task types
+
+- Aim: add and display a todo, deadline, and event.
+- Input: `todo borrow book`, `deadline submit report /by Friday 5pm`,
+  `event project meeting /from Monday 2pm /to 4pm`, `list`, `bye`.
+- Expected: `[T][ ] borrow book`, `[D][ ] submit report (by: Friday 5pm)`,
+  and `[E][ ] project meeting (from: Monday 2pm to: 4pm)`.
+
+## Completion status
+
+- Aim: mark and unmark a typed task.
+- Input: `todo read book`, `mark 1`, `list`, `unmark 1`, `list`, `bye`.
+- Expected: `[T][X] read book`, then `[T][ ] read book`.

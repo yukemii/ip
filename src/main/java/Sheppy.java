@@ -37,19 +37,64 @@ public class Sheppy {
             if (command.equals("list")) {
                 System.out.println("Here are the tasks in your list:");
                 for (int i = 0; i < taskCount; i++) {
-                    System.out.println((i + 1) + ".[" + tasks[i].getStatusIcon() + "] "
-                            + tasks[i].getDescription());
+                    System.out.println((i + 1) + "." + tasks[i]);
                 }
             } else if (command.startsWith("mark ")) {
                 taskCount = updateTaskStatus(command, tasks, taskCount, true);
             } else if (command.startsWith("unmark ")) {
                 taskCount = updateTaskStatus(command, tasks, taskCount, false);
+            } else if (command.startsWith("todo ")) {
+                taskCount = addTask(new Todo(command.substring(5)), tasks, taskCount);
+            } else if (command.startsWith("deadline ")) {
+                taskCount = addDeadline(command, tasks, taskCount);
+            } else if (command.startsWith("event ")) {
+                taskCount = addEvent(command, tasks, taskCount);
             } else if (taskCount < tasks.length) {
-                tasks[taskCount] = new Task(command);
-                taskCount++;
-                System.out.println("added: " + command);
+                taskCount = addTask(new Todo(command), tasks, taskCount);
             }
         }
+    }
+
+    /** Adds a task to the list and reports the new total. */
+    private static int addTask(Task task, Task[] tasks, int taskCount) {
+        if (taskCount >= tasks.length) {
+            System.out.println("Your task list is full.");
+            return taskCount;
+        }
+        tasks[taskCount] = task;
+        taskCount++;
+        System.out.println("Got it. I've added this task:");
+        System.out.println("  " + task);
+        System.out.println("Now you have " + taskCount + " tasks in the list.");
+        return taskCount;
+    }
+
+    /** Parses and adds a deadline command. */
+    private static int addDeadline(String command, Task[] tasks, int taskCount) {
+        String details = command.substring("deadline ".length());
+        int separator = details.indexOf(" /by ");
+        if (separator < 0) {
+            System.out.println("A deadline needs a /by date or time.");
+            return taskCount;
+        }
+        String description = details.substring(0, separator);
+        String by = details.substring(separator + " /by ".length());
+        return addTask(new Deadline(description, by), tasks, taskCount);
+    }
+
+    /** Parses and adds an event command. */
+    private static int addEvent(String command, Task[] tasks, int taskCount) {
+        String details = command.substring("event ".length());
+        int fromSeparator = details.indexOf(" /from ");
+        int toSeparator = details.indexOf(" /to ");
+        if (fromSeparator < 0 || toSeparator < 0 || toSeparator < fromSeparator) {
+            System.out.println("An event needs both /from and /to times.");
+            return taskCount;
+        }
+        String description = details.substring(0, fromSeparator);
+        String from = details.substring(fromSeparator + " /from ".length(), toSeparator);
+        String to = details.substring(toSeparator + " /to ".length());
+        return addTask(new Event(description, from, to), tasks, taskCount);
     }
 
     /**
@@ -84,7 +129,7 @@ public class Sheppy {
                 task.markAsUndone();
                 System.out.println("OK, I've marked this task as not done yet:");
             }
-            System.out.println("  [" + task.getStatusIcon() + "] " + task.getDescription());
+            System.out.println("  " + task);
         } catch (NumberFormatException exception) {
             System.out.println("Please provide a valid task number.");
         }

@@ -21,6 +21,7 @@ Unless the user says otherwise, assume that you are assisting a student working 
   * Add explanatory Javadoc comments to all classes and to nontrivial methods and fields when their purpose or behavior is not obvious.
   * Make generated code as self-explanatory as possible, and include explanatory comments where they improve understanding.
   * When faced with a design choice, choose the simplest option that is sufficient for the requirements, while briefly explaining relevant more advanced alternatives.
+  * After each code update, update `test/ui-test-plan.md` if the user interface changed and run the project-specific `test-ui` skill.
 
 # Project-specific requirements
 
