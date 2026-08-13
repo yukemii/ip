@@ -9,8 +9,11 @@ public class Deadline extends Task {
      * @param description the text describing the task
      * @param by the date or time by which it should be completed
      */
-    public Deadline(String description, String by) {
+    public Deadline(String description, String by) throws SheppyException {
         super(description);
+        if (by == null || by.isBlank()) {
+            throw new SheppyException("a deadline needs a date or time after /by.");
+        }
         this.by = by;
     }
 

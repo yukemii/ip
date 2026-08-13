@@ -11,7 +11,10 @@ public class Task {
      *
      * @param description the text describing the task
      */
-    public Task(String description) {
+    public Task(String description) throws SheppyException {
+        if (description == null || description.isBlank()) {
+            throw new SheppyException("a task description cannot be empty.");
+        }
         this.description = description;
         this.isDone = false;
     }

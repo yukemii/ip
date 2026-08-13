@@ -18,5 +18,26 @@
     "name": "Mark and unmark",
     "input": ["todo read book", "mark 1", "list", "unmark 1", "list", "bye"],
     "expected": ["[T][X] read book", "[T][ ] read book"]
+  },
+  {
+    "name": "Invalid commands do not change tasks",
+    "input": [
+      "todo",
+      "todo read book",
+      "blah",
+      "deadline report",
+      "event meeting",
+      "mark x",
+      "list",
+      "bye"
+    ],
+    "expected": [
+      "Baa-error: a task description cannot be empty.",
+      "Baa-error: I don't recognize that command.",
+      "Baa-error: a deadline needs a description and a /by date or time.",
+      "Baa-error: an event needs a description, /from time, and /to time.",
+      "Baa-error: the task number must be a whole number.",
+      "1.[T][ ] read book"
+    ]
   }
 ]

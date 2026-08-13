@@ -16,3 +16,12 @@ The cases in `test/ui-test-cases.json` are run with the project-specific
 - Aim: mark and unmark a typed task.
 - Input: `todo read book`, `mark 1`, `list`, `unmark 1`, `list`, `bye`.
 - Expected: `[T][X] read book`, then `[T][ ] read book`.
+
+## Error handling
+
+- Aim: reject empty descriptions, unknown commands, malformed date commands,
+  and invalid task numbers without changing the task list.
+- Input: `todo`, `todo read book`, `blah`, `deadline report`, `event meeting`,
+  `mark x`, `list`, `bye`.
+- Expected: specific `Baa-error:` messages, followed by a list containing only
+  `read book`.

@@ -5,7 +5,7 @@ public class Todo extends Task {
      *
      * @param description the text describing the task
      */
-    public Todo(String description) {
+    public Todo(String description) throws SheppyException {
         super(description);
     }
 }
