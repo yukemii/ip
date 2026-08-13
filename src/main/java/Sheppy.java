@@ -25,7 +25,7 @@ public class Sheppy {
         System.out.println("Baa-hello! I'm Sheppy, your woolly little helper.");
         System.out.println("What shall we graze on today?");
 
-        String[] tasks = new String[100];
+        Task[] tasks = new Task[100];
         int taskCount = 0;
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNextLine()) {
@@ -35,14 +35,59 @@ public class Sheppy {
                 return;
             }
             if (command.equals("list")) {
+                System.out.println("Here are the tasks in your list:");
                 for (int i = 0; i < taskCount; i++) {
-                    System.out.println((i + 1) + ". " + tasks[i]);
+                    System.out.println((i + 1) + ".[" + tasks[i].getStatusIcon() + "] "
+                            + tasks[i].getDescription());
                 }
+            } else if (command.startsWith("mark ")) {
+                taskCount = updateTaskStatus(command, tasks, taskCount, true);
+            } else if (command.startsWith("unmark ")) {
+                taskCount = updateTaskStatus(command, tasks, taskCount, false);
             } else if (taskCount < tasks.length) {
-                tasks[taskCount] = command;
+                tasks[taskCount] = new Task(command);
                 taskCount++;
                 System.out.println("added: " + command);
             }
         }
+    }
+
+    /**
+     * Updates a task's completion status based on a mark or unmark command.
+     *
+     * @param command the complete command entered by the user
+     * @param tasks the current task array
+     * @param taskCount the number of stored tasks
+     * @param markDone whether the task should be marked done
+     * @return the unchanged number of stored tasks
+     */
+    private static int updateTaskStatus(String command, Task[] tasks, int taskCount,
+                                        boolean markDone) {
+        String[] parts = command.split(" ");
+        if (parts.length != 2) {
+            System.out.println("Please provide a task number.");
+            return taskCount;
+        }
+
+        try {
+            int taskNumber = Integer.parseInt(parts[1]);
+            if (taskNumber < 1 || taskNumber > taskCount) {
+                System.out.println("That task number is not in your list.");
+                return taskCount;
+            }
+
+            Task task = tasks[taskNumber - 1];
+            if (markDone) {
+                task.markAsDone();
+                System.out.println("Nice! I've marked this task as done:");
+            } else {
+                task.markAsUndone();
+                System.out.println("OK, I've marked this task as not done yet:");
+            }
+            System.out.println("  [" + task.getStatusIcon() + "] " + task.getDescription());
+        } catch (NumberFormatException exception) {
+            System.out.println("Please provide a valid task number.");
+        }
+        return taskCount;
     }
 }
