@@ -48,12 +48,12 @@ public class Task {
     }
 
     /**
-     * Returns the type marker shown for this task.
+     * Returns the type of this task.
      *
-     * @return the task type marker
+     * @return this task's type
      */
-    public String getTypeIcon() {
-        return "T";
+    public TaskType getTaskType() {
+        return TaskType.TODO;
     }
 
     /**
@@ -72,7 +72,7 @@ public class Task {
      */
     @Override
     public String toString() {
-        return "[" + getTypeIcon() + "][" + getStatusIcon() + "] "
+        return "[" + getTaskType().getIcon() + "][" + getStatusIcon() + "] "
                 + getDisplayDescription();
     }
 }

@@ -18,8 +18,8 @@ public class Deadline extends Task {
     }
 
     @Override
-    public String getTypeIcon() {
-        return "D";
+    public TaskType getTaskType() {
+        return TaskType.DEADLINE;
     }
 
     @Override
