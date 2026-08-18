@@ -40,3 +40,20 @@ The cases in `test/ui-test-cases.json` are run with the project-specific
 - Input: add a todo, mark it done, then delete it.
 - Expected: normal command output, with the saved file ending with zero task
   lines after the deletion. Loading the file is intentionally not tested yet.
+
+## Level 7 loading
+
+- Aim: restore saved tasks and their completion status when Sheppy starts.
+- Setup: save todo, deadline, and event tasks in one run, then start Sheppy
+  again and use `list`.
+- Expected: all three task types and their saved done status are displayed.
+- Missing-file case: starting without `data/tasks.txt` starts with an empty
+  task list rather than crashing.
+
+## Level 7 corrupted data
+
+- Aim: report malformed saved data and start with an empty list instead of
+  crashing.
+- Fixtures: unknown task type, invalid completion status, and incomplete task
+  fields.
+- Expected: a specific `Baa-error:` message followed by an empty task list.

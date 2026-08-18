@@ -33,7 +33,13 @@ public class Sheppy {
         System.out.println("Baa-hello! I'm Sheppy, your woolly little helper.");
         System.out.println("What shall we graze on today?");
 
-        List<Task> tasks = new ArrayList<>();
+        List<Task> tasks;
+        try {
+            tasks = loadTasks();
+        } catch (SheppyException exception) {
+            System.out.println("Baa-error: " + exception.getMessage());
+            tasks = new ArrayList<>();
+        }
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNextLine()) {
             String command = scanner.nextLine();
@@ -181,6 +187,73 @@ public class Sheppy {
             Files.write(DATA_FILE, lines);
         } catch (IOException exception) {
             throw new SheppyException("I couldn't save your tasks: " + exception.getMessage());
+        }
+    }
+
+    /**
+     * Loads tasks from the relative data file when it exists.
+     *
+     * @return the tasks saved in the data file, or an empty list if it is absent
+     * @throws SheppyException if the file cannot be read or contains invalid data
+     */
+    private static List<Task> loadTasks() throws SheppyException {
+        List<Task> tasks = new ArrayList<>();
+        if (!Files.exists(DATA_FILE)) {
+            return tasks;
+        }
+
+        try {
+            for (String line : Files.readAllLines(DATA_FILE)) {
+                if (!line.isBlank()) {
+                    tasks.add(parseStoredTask(line));
+                }
+            }
+        } catch (IOException exception) {
+            throw new SheppyException("I couldn't load your tasks: " + exception.getMessage());
+        }
+        return tasks;
+    }
+
+    /** Parses one task line from the Level 7 storage format. */
+    private static Task parseStoredTask(String line) throws SheppyException {
+        String[] fields = line.split("\\s*\\|\\s*", -1);
+        if (fields.length < 3) {
+            throw new SheppyException("your task file contains an invalid line: " + line);
+        }
+
+        String type = fields[0];
+        String status = fields[1];
+        String description = fields[2];
+        Task task;
+        task = switch (type) {
+            case "T" -> {
+                requireFieldCount(fields, 3);
+                yield new Todo(description);
+            }
+            case "D" -> {
+                requireFieldCount(fields, 4);
+                yield new Deadline(description, fields[3]);
+            }
+            case "E" -> {
+                requireFieldCount(fields, 5);
+                yield new Event(description, fields[3], fields[4]);
+            }
+            default -> throw new SheppyException("your task file contains an unknown task type: " + type);
+        };
+
+        if (status.equals("1")) {
+            task.markAsDone();
+        } else if (!status.equals("0")) {
+            throw new SheppyException("your task file contains an invalid status: " + status);
+        }
+        return task;
+    }
+
+    /** Checks that a stored task has exactly the expected number of fields. */
+    private static void requireFieldCount(String[] fields, int expected)
+            throws SheppyException {
+        if (fields.length != expected) {
+            throw new SheppyException("your task file contains the wrong number of fields.");
         }
     }
 }
