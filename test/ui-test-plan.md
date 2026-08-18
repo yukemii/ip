@@ -33,3 +33,10 @@ The cases in `test/ui-test-cases.json` are run with the project-specific
   and attempt `delete x`.
 - Expected: the removed task is reported with its current status, the former
   second task becomes task 1, and the invalid delete produces a `Baa-error:`.
+
+## Level 7 saving
+
+- Aim: save every task-list change to the relative `data/tasks.txt` file.
+- Input: add a todo, mark it done, then delete it.
+- Expected: normal command output, with the saved file ending with zero task
+  lines after the deletion. Loading the file is intentionally not tested yet.

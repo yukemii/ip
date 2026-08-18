@@ -1,5 +1,8 @@
 import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Scanner;
 
 /**
@@ -9,6 +12,9 @@ import java.util.Scanner;
  * the user asks it to leave.</p>
  */
 public class Sheppy {
+    /** The relative path used for Sheppy's saved task data. */
+    private static final Path DATA_FILE = Path.of("data", "tasks.txt");
+
     /**
      * Runs Sheppy's greeting, task-management loop, and exit command.
      *
@@ -64,8 +70,9 @@ public class Sheppy {
     }
 
     /** Adds a task to the list and reports the new total. */
-    private static void addTask(Task task, List<Task> tasks) {
+    private static void addTask(Task task, List<Task> tasks) throws SheppyException {
         tasks.add(task);
+        saveTasks(tasks);
         System.out.println("Got it. I've added this task:");
         System.out.println("  " + task);
         System.out.println("Now you have " + tasks.size() + " tasks in the list.");
@@ -131,6 +138,7 @@ public class Sheppy {
             task.markAsUndone();
             System.out.println("OK, I've marked this task as not done yet:");
         }
+        saveTasks(tasks);
         System.out.println("  " + task);
     }
 
@@ -152,8 +160,27 @@ public class Sheppy {
         }
 
         Task deletedTask = tasks.remove(taskNumber - 1);
+        saveTasks(tasks);
         System.out.println("Noted. I've removed this task:");
         System.out.println("  " + deletedTask);
         System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+    }
+
+    /**
+     * Saves the current tasks to the relative data file.
+     *
+     * @param tasks the tasks to save
+     * @throws SheppyException if the data directory or file cannot be written
+     */
+    private static void saveTasks(List<Task> tasks) throws SheppyException {
+        try {
+            Files.createDirectories(DATA_FILE.getParent());
+            List<String> lines = tasks.stream()
+                    .map(Task::toStorageString)
+                    .toList();
+            Files.write(DATA_FILE, lines);
+        } catch (IOException exception) {
+            throw new SheppyException("I couldn't save your tasks: " + exception.getMessage());
+        }
     }
 }

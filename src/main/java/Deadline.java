@@ -26,4 +26,9 @@ public class Deadline extends Task {
     public String getDisplayDescription() {
         return super.getDisplayDescription() + " (by: " + by + ")";
     }
+
+    @Override
+    public String toStorageString() {
+        return super.toStorageString() + " | " + by;
+    }
 }
