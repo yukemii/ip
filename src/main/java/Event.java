@@ -31,4 +31,9 @@ public class Event extends Task {
     public String getDisplayDescription() {
         return super.getDisplayDescription() + " (from: " + from + " to: " + to + ")";
     }
+
+    @Override
+    public String toStorageString() {
+        return super.toStorageString() + " | " + from + " | " + to;
+    }
 }

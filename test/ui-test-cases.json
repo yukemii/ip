@@ -59,5 +59,46 @@
       "2.[T][ ] third task",
       "Baa-error: the task number must be a whole number."
     ]
+  },
+  {
+    "name": "Level 7 save changes",
+    "input": ["todo saved task", "mark 1", "delete 1", "bye"],
+    "expected": [
+      "Got it. I've added this task:",
+      "Nice! I've marked this task as done:",
+      "Noted. I've removed this task:"
+    ]
+  },
+  {
+    "name": "Level 7 missing storage file",
+    "input": ["list", "bye"],
+    "expected": ["Here are the tasks in your list:"]
+  },
+  {
+    "name": "Level 7 unknown stored task type",
+    "storage": ["X | 0 | invalid task"],
+    "input": ["list", "bye"],
+    "expected": [
+      "Baa-error: your task file contains an unknown task type: X",
+      "Here are the tasks in your list:"
+    ]
+  },
+  {
+    "name": "Level 7 invalid stored status",
+    "storage": ["T | 2 | invalid status"],
+    "input": ["list", "bye"],
+    "expected": [
+      "Baa-error: your task file contains an invalid status: 2",
+      "Here are the tasks in your list:"
+    ]
+  },
+  {
+    "name": "Level 7 incomplete stored task",
+    "storage": ["D | 0 | missing deadline"],
+    "input": ["list", "bye"],
+    "expected": [
+      "Baa-error: your task file contains the wrong number of fields.",
+      "Here are the tasks in your list:"
+    ]
   }
 ]

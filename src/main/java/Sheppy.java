@@ -1,5 +1,8 @@
 import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Scanner;
 
 /**
@@ -9,6 +12,9 @@ import java.util.Scanner;
  * the user asks it to leave.</p>
  */
 public class Sheppy {
+    /** The relative path used for Sheppy's saved task data. */
+    private static final Path DATA_FILE = Path.of("data", "tasks.txt");
+
     /**
      * Runs Sheppy's greeting, task-management loop, and exit command.
      *
@@ -27,7 +33,13 @@ public class Sheppy {
         System.out.println("Baa-hello! I'm Sheppy, your woolly little helper.");
         System.out.println("What shall we graze on today?");
 
-        List<Task> tasks = new ArrayList<>();
+        List<Task> tasks;
+        try {
+            tasks = loadTasks();
+        } catch (SheppyException exception) {
+            System.out.println("Baa-error: " + exception.getMessage());
+            tasks = new ArrayList<>();
+        }
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNextLine()) {
             String command = scanner.nextLine();
@@ -64,8 +76,9 @@ public class Sheppy {
     }
 
     /** Adds a task to the list and reports the new total. */
-    private static void addTask(Task task, List<Task> tasks) {
+    private static void addTask(Task task, List<Task> tasks) throws SheppyException {
         tasks.add(task);
+        saveTasks(tasks);
         System.out.println("Got it. I've added this task:");
         System.out.println("  " + task);
         System.out.println("Now you have " + tasks.size() + " tasks in the list.");
@@ -131,6 +144,7 @@ public class Sheppy {
             task.markAsUndone();
             System.out.println("OK, I've marked this task as not done yet:");
         }
+        saveTasks(tasks);
         System.out.println("  " + task);
     }
 
@@ -152,8 +166,94 @@ public class Sheppy {
         }
 
         Task deletedTask = tasks.remove(taskNumber - 1);
+        saveTasks(tasks);
         System.out.println("Noted. I've removed this task:");
         System.out.println("  " + deletedTask);
         System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+    }
+
+    /**
+     * Saves the current tasks to the relative data file.
+     *
+     * @param tasks the tasks to save
+     * @throws SheppyException if the data directory or file cannot be written
+     */
+    private static void saveTasks(List<Task> tasks) throws SheppyException {
+        try {
+            Files.createDirectories(DATA_FILE.getParent());
+            List<String> lines = tasks.stream()
+                    .map(Task::toStorageString)
+                    .toList();
+            Files.write(DATA_FILE, lines);
+        } catch (IOException exception) {
+            throw new SheppyException("I couldn't save your tasks: " + exception.getMessage());
+        }
+    }
+
+    /**
+     * Loads tasks from the relative data file when it exists.
+     *
+     * @return the tasks saved in the data file, or an empty list if it is absent
+     * @throws SheppyException if the file cannot be read or contains invalid data
+     */
+    private static List<Task> loadTasks() throws SheppyException {
+        List<Task> tasks = new ArrayList<>();
+        if (!Files.exists(DATA_FILE)) {
+            return tasks;
+        }
+
+        try {
+            for (String line : Files.readAllLines(DATA_FILE)) {
+                if (!line.isBlank()) {
+                    tasks.add(parseStoredTask(line));
+                }
+            }
+        } catch (IOException exception) {
+            throw new SheppyException("I couldn't load your tasks: " + exception.getMessage());
+        }
+        return tasks;
+    }
+
+    /** Parses one task line from the Level 7 storage format. */
+    private static Task parseStoredTask(String line) throws SheppyException {
+        String[] fields = line.split("\\s*\\|\\s*", -1);
+        if (fields.length < 3) {
+            throw new SheppyException("your task file contains an invalid line: " + line);
+        }
+
+        String type = fields[0];
+        String status = fields[1];
+        String description = fields[2];
+        Task task;
+        task = switch (type) {
+            case "T" -> {
+                requireFieldCount(fields, 3);
+                yield new Todo(description);
+            }
+            case "D" -> {
+                requireFieldCount(fields, 4);
+                yield new Deadline(description, fields[3]);
+            }
+            case "E" -> {
+                requireFieldCount(fields, 5);
+                yield new Event(description, fields[3], fields[4]);
+            }
+            default -> throw new SheppyException("your task file contains an unknown task type: " + type);
+        };
+
+        if (status.equals("1")) {
+            task.markAsDone();
+        } else if (!status.equals("0")) {
+            throw new SheppyException("your task file contains an invalid status: " + status);
+        }
+        return task;
+    }
+
+    /** Checks that a stored task has exactly the expected number of fields. */
+    private static void requireFieldCount(String[] fields, int expected)
+            throws SheppyException {
+        if (fields.length != expected) {
+            throw new SheppyException("your task file contains the wrong number of fields.");
+        }
     }
 }

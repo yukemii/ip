@@ -66,6 +66,15 @@ public class Task {
     }
 
     /**
+     * Returns this task in the format used by Level 7 file storage.
+     *
+     * @return the serialized task
+     */
+    public String toStorageString() {
+        return getTaskType().getIcon() + " | " + (isDone ? "1" : "0") + " | " + description;
+    }
+
+    /**
      * Returns the task in the format used by the user interface.
      *
      * @return the formatted task
