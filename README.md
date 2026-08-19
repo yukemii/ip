@@ -1,25 +1,46 @@
-# Duke project template
+# Sheppy
 
-This is a project template for a greenfield Java project. It's named after the Java mascot _Duke_. Given below are instructions on how to use it.
+Sheppy is a small command-line task manager written in Java 25.
 
-## Setting up in Intellij
+## Running with Gradle
 
-Prerequisites: JDK 25, update Intellij to the most recent version.
+This project uses Gradle's standard Java layout. The application entry point is
+`sheppy.Sheppy`.
 
-1. Open Intellij (if you are not in the welcome screen, click `File` > `Close Project` to close the existing project first)
-1. Open the project into Intellij as follows:
-   1. Click `Open`.
-   1. Select the project directory, and click `OK`.
-   1. If there are any further prompts, accept the defaults.
-1. Configure the project to use **JDK 25** (not other versions) as explained in [here](https://www.jetbrains.com/help/idea/sdk.html#set-up-jdk).<br>
-   In the same dialog, set the **Project language level** field to the `SDK default` option.
-1. After that, locate the `src/main/java/Duke.java` file, right-click it, and choose `Run Duke.main()` (if the code editor is showing compile errors, try restarting the IDE). If the setup is correct, you should see something like the below as the output:
-   ```
-    ____        _        
-   |  _ \ _   _| | _____ 
-   | | | | | | | |/ / _ \
-   | |_| | |_| |   <  __/
-   |____/ \__,_|_|\_\___|
-   ```
+Use the included Gradle Wrapper so the project downloads and uses the pinned
+Gradle version automatically:
 
-**Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
+```bash
+./gradlew build
+./gradlew run
+```
+
+The `run` task keeps the terminal connected to Sheppy's input. Type commands
+such as `list` or `bye` as usual.
+
+Useful tasks include:
+
+```bash
+./gradlew tasks     # list available tasks
+./gradlew build     # compile, test, and assemble the project
+./gradlew test      # run unit tests
+./gradlew jar       # create build/libs/sheppy-1.0.jar
+./gradlew clean     # remove generated build output
+```
+
+On Windows, use `gradlew.bat` instead of `./gradlew`.
+
+Gradle uses the Java 25 toolchain configured in `build.gradle`. IntelliJ and
+VS Code can both import and run the same Gradle project; the IDE only provides
+a graphical way to invoke the Gradle tasks.
+
+The standard Gradle source directories are:
+
+```text
+src/main/java       application source
+src/test/java       unit tests
+```
+
+The generated `build/` directory contains compiled classes and the JAR and is
+ignored by Git. The `gradle/wrapper/` files and `gradlew` scripts are committed
+so that everyone uses the same Gradle version.

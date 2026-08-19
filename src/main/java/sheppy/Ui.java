@@ -12,14 +12,12 @@ public class Ui {
 
     /** Displays Sheppy's welcome messages. */
     public void showWelcome() {
-        String banner = "  _____ _                       _   _\n"
-                + " / ____| |                     | | | |\n"
-                + "| (___ | |__   ___ _ __  _ __  | |_| |\n"
-                + " \\___ \\| '_ \\ / _ \\ '_ \\| '_ \\ |  _  |\n"
-                + " ____) | | | |  __/ |_) | |_) || | | |\n"
-                + "|_____/|_| |_|\\___| .__/| .__/ |_| |_|\n"
-                + "                   | |   | |\n"
-                + "                   |_|   |_|\n";
+        String banner = "        __\n"
+                + "       (oo)\n"
+                + "  +---/----\\-----------------------+\n"
+                + "  |        S H E P P Y             |\n"
+                + "  |      your woolly helper        |\n"
+                + "  +--------------------------------+\n";
         System.out.println(banner);
         System.out.println("Baa-hello! I'm Sheppy, your woolly little helper.");
         System.out.println("What shall we graze on today?");

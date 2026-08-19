@@ -9,6 +9,12 @@
       "bye"
     ],
     "expected": [
+      "        __",
+      "       (oo)",
+      "  +---/----\\-----------------------+",
+      "  |        S H E P P Y             |",
+      "  |      your woolly helper        |",
+      "  +--------------------------------+",
       "[T][ ] borrow book",
       "[D][ ] submit report (by: Jun 06 2019)",
       "[E][ ] project meeting (from: Monday 2pm to: 4pm)"
