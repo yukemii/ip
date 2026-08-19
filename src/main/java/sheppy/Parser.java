@@ -25,6 +25,8 @@ public class Parser {
             return CommandType.BYE;
         } else if (command.equals("list")) {
             return CommandType.LIST;
+        } else if (command.equals("find") || command.startsWith("find ")) {
+            return CommandType.FIND;
         } else if (command.equals("mark") || command.startsWith("mark ")) {
             return CommandType.MARK;
         } else if (command.equals("unmark") || command.startsWith("unmark ")) {
@@ -105,13 +107,28 @@ public class Parser {
     }
 
     /**
+     * Returns the keyword from a find command.
+     *
+     * @param command the complete find command
+     * @return the keyword to search for
+     * @throws SheppyException if the keyword is empty
+     */
+    public static String parseFindKeyword(String command) throws SheppyException {
+        String keyword = command.substring("find".length()).trim();
+        if (keyword.isEmpty()) {
+            throw new SheppyException("find needs a keyword to search for.");
+        }
+        return keyword;
+    }
+
+    /**
      * Creates the error used for an unrecognized command.
      *
      * @return an exception with Sheppy's unknown-command message
      */
     public static SheppyException unknownCommand() {
         return new SheppyException(
-                "I don't recognize that command. Try todo, deadline, event, list, mark, unmark, or delete.");
+                "I don't recognize that command. Try todo, deadline, event, list, find, mark, unmark, or delete.");
     }
 
     /** Parses a date entered in the Level 8 ISO format. */

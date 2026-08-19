@@ -121,5 +121,20 @@
       "Baa-error: please use dates in yyyy-MM-dd format, such as 2019-10-15.",
       "Here are the tasks in your list:"
     ]
+  },
+  {
+    "name": "Level 9 find tasks",
+    "input": [
+      "todo read book",
+      "todo exercise",
+      "deadline return book /by 2019-10-15",
+      "find book",
+      "bye"
+    ],
+    "expected": [
+      "Here are the matching tasks in your list:",
+      "1.[T][ ] read book",
+      "2.[D][ ] return book (by: Oct 15 2019)"
+    ]
   }
 ]

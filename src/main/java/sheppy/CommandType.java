@@ -8,6 +8,9 @@ public enum CommandType {
     /** Display all tasks. */
     LIST,
 
+    /** Find tasks whose descriptions contain a keyword. */
+    FIND,
+
     /** Add a todo task. */
     TODO,
 

@@ -71,3 +71,10 @@ The cases in `test/ui-test-cases.json` are run with the project-specific
 - Expected: the deadline is displayed as `Oct 15 2019`.
 - Invalid input: dates such as `October 15` are rejected with guidance to use
   `yyyy-MM-dd`.
+
+## Level 9 find
+
+- Aim: find tasks whose descriptions contain a keyword.
+- Input: add tasks containing and not containing `book`, then run `find book`.
+- Expected: the matching tasks are displayed under the matching-tasks heading
+  in their original order.

@@ -1,5 +1,6 @@
 package sheppy;
 
+import java.util.List;
 import java.util.Scanner;
 
 import sheppy.task.Task;
@@ -60,6 +61,18 @@ public class Ui {
         System.out.println("Here are the tasks in your list:");
         for (int i = 1; i <= tasks.size(); i++) {
             System.out.println(i + "." + tasks.get(i));
+        }
+    }
+
+    /**
+     * Displays tasks matching a search keyword.
+     *
+     * @param matchingTasks the tasks whose descriptions matched the keyword
+     */
+    public void showMatchingTasks(List<Task> matchingTasks) {
+        System.out.println("Here are the matching tasks in your list:");
+        for (int i = 0; i < matchingTasks.size(); i++) {
+            System.out.println((i + 1) + "." + matchingTasks.get(i));
         }
     }
 

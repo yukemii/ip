@@ -55,4 +55,15 @@ class TaskListTest {
         assertThrows(SheppyException.class, () -> tasks.get(0));
         assertThrows(SheppyException.class, () -> tasks.get(2));
     }
+
+    /** Checks that find returns matching tasks in their original order. */
+    @Test
+    void find_keywordReturnsMatchingTasks() throws SheppyException {
+        TaskList tasks = new TaskList(List.of(new Todo("read book"), new Todo("exercise"),
+                new Todo("return book")));
+
+        List<Task> matchingTasks = tasks.find("book");
+
+        assertEquals(List.of(tasks.get(1), tasks.get(3)), matchingTasks);
+    }
 }
