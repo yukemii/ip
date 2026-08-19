@@ -1,5 +1,11 @@
 # Sheppy UI test plan
 
+## Welcome banner
+
+- Aim: display a readable ASCII banner for Sheppy when the application starts.
+- Expected: the banner spells SHEPPY, with the final character clearly shaped
+  as a Y.
+
 The cases in `test/ui-test-cases.json` are run with the project-specific
 `.codex/skills/test-ui/scripts/run_ui_tests.py` script.
 
