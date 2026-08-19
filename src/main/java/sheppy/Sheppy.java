@@ -1,4 +1,10 @@
+package sheppy;
+
 import java.util.List;
+
+import sheppy.storage.Storage;
+import sheppy.task.Task;
+import sheppy.task.TaskList;
 
 /** Coordinates Sheppy's user interface, parser, task list, and storage. */
 public class Sheppy {

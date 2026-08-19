@@ -1,3 +1,5 @@
+package sheppy;
+
 /** The commands understood by Sheppy. */
 public enum CommandType {
     /** Exit the application. */

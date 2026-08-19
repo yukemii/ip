@@ -1,3 +1,7 @@
+package sheppy.task;
+
+import sheppy.SheppyException;
+
 /** Represents a task that takes place over a specified time range. */
 public class Event extends Task {
     /** The starting date or time of the event. */

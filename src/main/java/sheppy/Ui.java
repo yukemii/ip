@@ -1,4 +1,9 @@
+package sheppy;
+
 import java.util.Scanner;
+
+import sheppy.task.Task;
+import sheppy.task.TaskList;
 
 /** Handles Sheppy's interaction with the user. */
 public class Ui {
