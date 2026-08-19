@@ -19,6 +19,7 @@ class ParserTest {
         assertEquals(CommandType.TODO, Parser.parseCommand("todo read book"));
         assertEquals(CommandType.DEADLINE, Parser.parseCommand("deadline report /by 2025-01-01"));
         assertEquals(CommandType.EVENT, Parser.parseCommand("event meeting /from 2pm /to 4pm"));
+        assertEquals(CommandType.FIND, Parser.parseCommand("find book"));
         assertEquals(CommandType.UNKNOWN, Parser.parseCommand("schedule meeting"));
     }
 
@@ -48,5 +49,11 @@ class ParserTest {
     void parseTask_invalidDeadlineDateThrowsSheppyException() {
         assertThrows(SheppyException.class,
                 () -> Parser.parseTask("deadline report /by October 15"));
+    }
+
+    /** Checks that a find command requires a non-empty keyword. */
+    @Test
+    void parseFindKeyword_emptyKeywordThrowsSheppyException() {
+        assertThrows(SheppyException.class, () -> Parser.parseFindKeyword("find"));
     }
 }

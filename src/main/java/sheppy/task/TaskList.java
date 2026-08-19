@@ -87,6 +87,18 @@ public class TaskList {
         return Collections.unmodifiableList(tasks);
     }
 
+    /**
+     * Returns tasks whose descriptions contain the given keyword.
+     *
+     * @param keyword the text to search for
+     * @return the matching tasks in their original order
+     */
+    public List<Task> find(String keyword) {
+        return tasks.stream()
+                .filter(task -> task.getDescription().contains(keyword))
+                .toList();
+    }
+
     /** Converts a user-facing one-based number into an internal index. */
     private int toIndex(int taskNumber) throws SheppyException {
         if (taskNumber < 1 || taskNumber > tasks.size()) {

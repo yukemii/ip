@@ -39,6 +39,9 @@ public class Sheppy {
                     return;
                 } else if (commandType == CommandType.LIST) {
                     ui.showTasks(tasks);
+                } else if (commandType == CommandType.FIND) {
+                    String keyword = Parser.parseFindKeyword(command);
+                    ui.showMatchingTasks(tasks.find(keyword));
                 } else if (commandType == CommandType.MARK) {
                     updateTaskStatus(command, tasks, storage, ui, true);
                 } else if (commandType == CommandType.UNMARK) {
