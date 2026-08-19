@@ -14,6 +14,7 @@ public class Task {
      * Creates an unfinished task.
      *
      * @param description the text describing the task
+     * @throws SheppyException if the description is empty
      */
     public Task(String description) throws SheppyException {
         if (description == null || description.isBlank()) {

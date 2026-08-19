@@ -8,6 +8,10 @@ import sheppy.task.TaskList;
 
 /** Coordinates Sheppy's user interface, parser, task list, and storage. */
 public class Sheppy {
+    /** Prevents instantiation of this command-line application class. */
+    private Sheppy() {
+    }
+
     /**
      * Starts Sheppy's command loop.
      *

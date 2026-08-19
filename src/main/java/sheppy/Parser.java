@@ -10,7 +10,16 @@ import sheppy.task.Todo;
 
 /** Interprets user commands and creates tasks from them. */
 public class Parser {
-    /** Identifies the command represented by the user's input. */
+    /** Prevents instantiation of this utility class. */
+    private Parser() {
+    }
+
+    /**
+     * Identifies the command represented by the user's input.
+     *
+     * @param command the complete command entered by the user
+     * @return the matching command type, or {@link CommandType#UNKNOWN}
+     */
     public static CommandType parseCommand(String command) {
         if (command.equals("bye")) {
             return CommandType.BYE;
@@ -74,7 +83,13 @@ public class Parser {
         return new Event(description, from, to);
     }
 
-    /** Parses a task number from a mark, unmark, or delete command. */
+    /**
+     * Parses a task number from a mark, unmark, or delete command.
+     *
+     * @param command the complete command entered by the user
+     * @return the one-based task number
+     * @throws SheppyException if the command does not contain a valid number
+     */
     public static int parseTaskNumber(String command) throws SheppyException {
         String[] parts = command.trim().split("\\s+");
         String commandName = parts[0];
@@ -89,7 +104,11 @@ public class Parser {
         }
     }
 
-    /** Creates the error used for an unrecognized command. */
+    /**
+     * Creates the error used for an unrecognized command.
+     *
+     * @return an exception with Sheppy's unknown-command message
+     */
     public static SheppyException unknownCommand() {
         return new SheppyException(
                 "I don't recognize that command. Try todo, deadline, event, list, mark, unmark, or delete.");

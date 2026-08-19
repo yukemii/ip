@@ -20,6 +20,7 @@ public class Deadline extends Task {
      *
      * @param description the text describing the task
      * @param by the date by which it should be completed
+     * @throws SheppyException if the description is empty or the date is null
      */
     public Deadline(String description, LocalDate by) throws SheppyException {
         super(description);
@@ -29,16 +30,19 @@ public class Deadline extends Task {
         this.by = by;
     }
 
+    /** @return the deadline task type */
     @Override
     public TaskType getTaskType() {
         return TaskType.DEADLINE;
     }
 
+    /** @return the description followed by the formatted deadline */
     @Override
     public String getDisplayDescription() {
         return super.getDisplayDescription() + " (by: " + by.format(DISPLAY_FORMAT) + ")";
     }
 
+    /** @return the task serialized with its ISO deadline date */
     @Override
     public String toStorageString() {
         return super.toStorageString() + " | " + by;

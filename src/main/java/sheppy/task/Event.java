@@ -16,6 +16,7 @@ public class Event extends Task {
      * @param description the text describing the event
      * @param from the event's starting date or time
      * @param to the event's ending date or time
+     * @throws SheppyException if the description, start, or end is empty
      */
     public Event(String description, String from, String to) throws SheppyException {
         super(description);
@@ -26,16 +27,19 @@ public class Event extends Task {
         this.to = to;
     }
 
+    /** @return the event task type */
     @Override
     public TaskType getTaskType() {
         return TaskType.EVENT;
     }
 
+    /** @return the description followed by the event time range */
     @Override
     public String getDisplayDescription() {
         return super.getDisplayDescription() + " (from: " + from + " to: " + to + ")";
     }
 
+    /** @return the task serialized with its start and end times */
     @Override
     public String toStorageString() {
         return super.toStorageString() + " | " + from + " | " + to;

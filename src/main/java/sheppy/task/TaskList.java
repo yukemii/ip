@@ -20,7 +20,11 @@ public class TaskList {
         tasks = new ArrayList<>(initialTasks);
     }
 
-    /** Adds a task to the end of the list. */
+    /**
+     * Adds a task to the end of the list.
+     *
+     * @param task the task to add
+     */
     public void add(Task task) {
         tasks.add(task);
     }
@@ -65,7 +69,11 @@ public class TaskList {
         return tasks.remove(toIndex(taskNumber));
     }
 
-    /** @return the number of tasks in the list */
+    /**
+     * Returns the number of tasks in the list.
+     *
+     * @return the number of tasks
+     */
     public int size() {
         return tasks.size();
     }
