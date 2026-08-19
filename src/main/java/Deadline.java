@@ -1,18 +1,26 @@
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
 /** Represents a task that must be completed by a specified date or time. */
 public class Deadline extends Task {
-    /** The date or time by which the task should be completed. */
-    private final String by;
+    /** The date by which the task should be completed. */
+    private final LocalDate by;
+
+    /** The format used when displaying a deadline to the user. */
+    private static final DateTimeFormatter DISPLAY_FORMAT =
+            DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
 
     /**
      * Creates a deadline task.
      *
      * @param description the text describing the task
-     * @param by the date or time by which it should be completed
+     * @param by the date by which it should be completed
      */
-    public Deadline(String description, String by) throws SheppyException {
+    public Deadline(String description, LocalDate by) throws SheppyException {
         super(description);
-        if (by == null || by.isBlank()) {
-            throw new SheppyException("a deadline needs a date or time after /by.");
+        if (by == null) {
+            throw new SheppyException("a deadline needs a date after /by.");
         }
         this.by = by;
     }
@@ -24,7 +32,7 @@ public class Deadline extends Task {
 
     @Override
     public String getDisplayDescription() {
-        return super.getDisplayDescription() + " (by: " + by + ")";
+        return super.getDisplayDescription() + " (by: " + by.format(DISPLAY_FORMAT) + ")";
     }
 
     @Override

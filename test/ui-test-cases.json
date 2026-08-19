@@ -3,14 +3,14 @@
     "name": "Level 4 task types",
     "input": [
       "todo borrow book",
-      "deadline submit report /by Friday 5pm",
+      "deadline submit report /by 2019-06-06",
       "event project meeting /from Monday 2pm /to 4pm",
       "list",
       "bye"
     ],
     "expected": [
       "[T][ ] borrow book",
-      "[D][ ] submit report (by: Friday 5pm)",
+      "[D][ ] submit report (by: Jun 06 2019)",
       "[E][ ] project meeting (from: Monday 2pm to: 4pm)"
     ]
   },
@@ -98,6 +98,21 @@
     "input": ["list", "bye"],
     "expected": [
       "Baa-error: your task file contains the wrong number of fields.",
+      "Here are the tasks in your list:"
+    ]
+  },
+  {
+    "name": "Level 8 typed deadline date",
+    "input": ["deadline submit report /by 2019-10-15", "list", "bye"],
+    "expected": [
+      "[D][ ] submit report (by: Oct 15 2019)"
+    ]
+  },
+  {
+    "name": "Level 8 invalid deadline date",
+    "input": ["deadline submit report /by October 15", "list", "bye"],
+    "expected": [
+      "Baa-error: please use dates in yyyy-MM-dd format, such as 2019-10-15.",
       "Here are the tasks in your list:"
     ]
   }

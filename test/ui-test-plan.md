@@ -6,9 +6,9 @@ The cases in `test/ui-test-cases.json` are run with the project-specific
 ## Level 4 task types
 
 - Aim: add and display a todo, deadline, and event.
-- Input: `todo borrow book`, `deadline submit report /by Friday 5pm`,
+- Input: `todo borrow book`, `deadline submit report /by 2019-06-06`,
   `event project meeting /from Monday 2pm /to 4pm`, `list`, `bye`.
-- Expected: `[T][ ] borrow book`, `[D][ ] submit report (by: Friday 5pm)`,
+- Expected: `[T][ ] borrow book`, `[D][ ] submit report (by: Jun 06 2019)`,
   and `[E][ ] project meeting (from: Monday 2pm to: 4pm)`.
 
 ## Completion status
@@ -57,3 +57,11 @@ The cases in `test/ui-test-cases.json` are run with the project-specific
 - Fixtures: unknown task type, invalid completion status, and incomplete task
   fields.
 - Expected: a specific `Baa-error:` message followed by an empty task list.
+
+## Level 8 typed deadline dates
+
+- Aim: parse deadline dates as `LocalDate` rather than plain strings.
+- Input: `deadline submit report /by 2019-10-15`, `list`, `bye`.
+- Expected: the deadline is displayed as `Oct 15 2019`.
+- Invalid input: dates such as `October 15` are rejected with guidance to use
+  `yyyy-MM-dd`.
