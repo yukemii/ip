@@ -22,6 +22,8 @@ Unless the user says otherwise, assume that you are assisting a student working 
   * Make generated code as self-explanatory as possible, and include explanatory comments where they improve understanding.
   * When faced with a design choice, choose the simplest option that is sufficient for the requirements, while briefly explaining relevant more advanced alternatives.
   * After each code update, update `test/ui-test-plan.md` if the user interface changed and run the project-specific `test-ui` skill.
+  * For Java changes, follow the project skill `.codex/skills/seedu-java-coding-standard/SKILL.md`.
+  * For Git commits, branches, merges, tags, and pushes, follow `.codex/skills/seedu-git-standard/SKILL.md`.
 
 # Project-specific requirements
 
@@ -34,3 +36,7 @@ Ensure that Java 25 is used when running the application or build tasks. On macO
 Use lightweight tags unless the user requests an annotated tag.
 When proposing or creating a commit message, include enough detail to explain the rationale for the change.
 Do not commit or push unless explicitly asked.
+
+## Project skills
+
+The project-specific `seedu-java-coding-standard` and `seedu-git-standard` skills are required for the corresponding work. If a requested visual-presentation skill is unavailable, report the relevant `git diff --stat` and diff instead of silently skipping the review.
