@@ -3,8 +3,8 @@
 ## Welcome banner
 
 - Aim: display a readable ASCII banner for Sheppy when the application starts.
-- Expected: the banner spells SHEPPY, with the final character clearly shaped
-  as a Y.
+- Expected: the banner clearly displays S H E P P Y and the chatbot's sheep
+  personality.
 
 The cases in `test/ui-test-cases.json` are run with the project-specific
 `.codex/skills/test-ui/scripts/run_ui_tests.py` script.
