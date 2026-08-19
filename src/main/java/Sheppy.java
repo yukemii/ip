@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -94,7 +96,7 @@ public class Sheppy {
         }
         String description = details.substring(0, separator).trim();
         String by = details.substring(separator + " /by ".length()).trim();
-        addTask(new Deadline(description, by), tasks);
+        addTask(new Deadline(description, parseDate(by)), tasks);
     }
 
     /** Parses and adds an event command. */
@@ -232,7 +234,7 @@ public class Sheppy {
             }
             case "D" -> {
                 requireFieldCount(fields, 4);
-                yield new Deadline(description, fields[3]);
+                yield new Deadline(description, parseDate(fields[3]));
             }
             case "E" -> {
                 requireFieldCount(fields, 5);
@@ -254,6 +256,15 @@ public class Sheppy {
             throws SheppyException {
         if (fields.length != expected) {
             throw new SheppyException("your task file contains the wrong number of fields.");
+        }
+    }
+
+    /** Parses a date entered in the Level 8 ISO format. */
+    private static LocalDate parseDate(String value) throws SheppyException {
+        try {
+            return LocalDate.parse(value);
+        } catch (DateTimeParseException exception) {
+            throw new SheppyException("please use dates in yyyy-MM-dd format, such as 2019-10-15.");
         }
     }
 }
