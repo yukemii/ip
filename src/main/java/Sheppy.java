@@ -38,30 +38,28 @@ public class Sheppy {
         while (scanner.hasNextLine()) {
             String command = scanner.nextLine();
             try {
-                if (command.equals("bye")) {
+                CommandType commandType = Parser.parseCommand(command);
+                if (commandType == CommandType.BYE) {
                     System.out.println("Baa-bye! Keep your thoughts cozy and your tasks tidy.");
                     return;
                 }
-                if (command.equals("list")) {
+                if (commandType == CommandType.LIST) {
                     System.out.println("Here are the tasks in your list:");
                     for (int i = 1; i <= tasks.size(); i++) {
                         System.out.println(i + "." + tasks.get(i));
                     }
-                } else if (command.equals("mark") || command.startsWith("mark ")) {
+                } else if (commandType == CommandType.MARK) {
                     updateTaskStatus(command, tasks, storage, true);
-                } else if (command.equals("unmark") || command.startsWith("unmark ")) {
+                } else if (commandType == CommandType.UNMARK) {
                     updateTaskStatus(command, tasks, storage, false);
-                } else if (command.equals("delete") || command.startsWith("delete ")) {
+                } else if (commandType == CommandType.DELETE) {
                     deleteTask(command, tasks, storage);
-                } else if (command.equals("todo") || command.startsWith("todo ")) {
-                    addTask(new Todo(command.substring(4).trim()), tasks, storage);
-                } else if (command.equals("deadline") || command.startsWith("deadline ")) {
-                    addDeadline(command, tasks, storage);
-                } else if (command.equals("event") || command.startsWith("event ")) {
-                    addEvent(command, tasks, storage);
+                } else if (commandType == CommandType.TODO
+                        || commandType == CommandType.DEADLINE
+                        || commandType == CommandType.EVENT) {
+                    addTask(Parser.parseTask(command), tasks, storage);
                 } else {
-                    throw new SheppyException(
-                            "I don't recognize that command. Try todo, deadline, event, list, mark, unmark, or delete.");
+                    throw Parser.unknownCommand();
                 }
             } catch (SheppyException exception) {
                 System.out.println("Baa-error: " + exception.getMessage());
@@ -79,34 +77,6 @@ public class Sheppy {
         System.out.println("Now you have " + tasks.size() + " tasks in the list.");
     }
 
-    /** Parses and adds a deadline command. */
-    private static void addDeadline(String command, TaskList tasks, Storage storage)
-            throws SheppyException {
-        String details = command.substring("deadline ".length());
-        int separator = details.indexOf(" /by ");
-        if (separator < 0) {
-            throw new SheppyException("a deadline needs a description and a /by date or time.");
-        }
-        String description = details.substring(0, separator).trim();
-        String by = details.substring(separator + " /by ".length()).trim();
-        addTask(new Deadline(description, parseDate(by)), tasks, storage);
-    }
-
-    /** Parses and adds an event command. */
-    private static void addEvent(String command, TaskList tasks, Storage storage)
-            throws SheppyException {
-        String details = command.substring("event ".length());
-        int fromSeparator = details.indexOf(" /from ");
-        int toSeparator = details.indexOf(" /to ");
-        if (fromSeparator < 0 || toSeparator < 0 || toSeparator < fromSeparator) {
-            throw new SheppyException("an event needs a description, /from time, and /to time.");
-        }
-        String description = details.substring(0, fromSeparator).trim();
-        String from = details.substring(fromSeparator + " /from ".length(), toSeparator).trim();
-        String to = details.substring(toSeparator + " /to ".length()).trim();
-        addTask(new Event(description, from, to), tasks, storage);
-    }
-
     /**
      * Updates a task's completion status based on a mark or unmark command.
      *
@@ -116,8 +86,7 @@ public class Sheppy {
     */
     private static void updateTaskStatus(String command, TaskList tasks, Storage storage,
                                          boolean markDone) throws SheppyException {
-        String commandName = command.trim().split("\\s+")[0];
-        int taskNumber = parseTaskNumber(command, commandName);
+        int taskNumber = Parser.parseTaskNumber(command);
         Task task = tasks.updateStatus(taskNumber, markDone);
         if (markDone) {
             System.out.println("Nice! I've marked this task as done:");
@@ -131,7 +100,7 @@ public class Sheppy {
     /** Deletes a task and reports the remaining total. */
     private static void deleteTask(String command, TaskList tasks, Storage storage)
             throws SheppyException {
-        int taskNumber = parseTaskNumber(command, "delete");
+        int taskNumber = Parser.parseTaskNumber(command);
         Task deletedTask = tasks.remove(taskNumber);
         storage.save(tasks);
         System.out.println("Noted. I've removed this task:");
@@ -139,27 +108,4 @@ public class Sheppy {
         System.out.println("Now you have " + tasks.size() + " tasks in the list.");
     }
 
-    /** Parses the task number from a mark, unmark, or delete command. */
-    private static int parseTaskNumber(String command, String commandName)
-            throws SheppyException {
-        String[] parts = command.trim().split("\\s+");
-        if (parts.length != 2) {
-            throw new SheppyException("use " + commandName
-                    + " followed by a task number, such as " + commandName + " 2.");
-        }
-        try {
-            return Integer.parseInt(parts[1]);
-        } catch (NumberFormatException exception) {
-            throw new SheppyException("the task number must be a whole number.");
-        }
-    }
-
-    /** Parses a date entered in the Level 8 ISO format. */
-    private static java.time.LocalDate parseDate(String value) throws SheppyException {
-        try {
-            return java.time.LocalDate.parse(value);
-        } catch (java.time.format.DateTimeParseException exception) {
-            throw new SheppyException("please use dates in yyyy-MM-dd format, such as 2019-10-15.");
-        }
-    }
 }
