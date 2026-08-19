@@ -33,6 +33,12 @@ tasks.named('run') {
     standardInput = System.in
 }
 
+tasks.named('jar') {
+    manifest {
+        attributes('Main-Class': application.mainClass.get())
+    }
+}
+
 tasks.named('test') {
     useJUnitPlatform()
 }

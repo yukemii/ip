@@ -44,3 +44,20 @@ src/test/java       unit tests
 The generated `build/` directory contains compiled classes and the JAR and is
 ignored by Git. The `gradle/wrapper/` files and `gradlew` scripts are committed
 so that everyone uses the same Gradle version.
+
+## Creating and running the executable JAR
+
+Create the JAR with:
+
+```bash
+./gradlew jar
+```
+
+Gradle places it at `build/libs/sheppy-1.0.jar`. To run it directly:
+
+```bash
+java -jar build/libs/sheppy-1.0.jar
+```
+
+The JAR can also be copied into an empty folder and run there. Sheppy will
+create its relative `data/tasks.txt` file in that folder when it saves tasks.
