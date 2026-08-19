@@ -61,3 +61,16 @@ java -jar build/libs/sheppy-1.0.jar
 
 The JAR can also be copied into an empty folder and run there. Sheppy will
 create its relative `data/tasks.txt` file in that folder when it saves tasks.
+
+## Coding conventions
+
+The Java source follows the SE-EDU basic and intermediate coding conventions:
+
+- Use four spaces for indentation, not tabs.
+- Keep lines at 120 characters or fewer.
+- Use PascalCase for classes and lowerCamelCase for methods and variables.
+- Use braces for control-flow blocks.
+- Add Javadoc to public classes and methods and to non-obvious fields.
+
+The `.editorconfig` file records the formatting rules for editors that support
+EditorConfig, including VS Code.
