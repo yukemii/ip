@@ -1,6 +1,10 @@
+package sheppy.task;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import sheppy.SheppyException;
 
 /** Owns Sheppy's collection of tasks and its task-level operations. */
 public class TaskList {

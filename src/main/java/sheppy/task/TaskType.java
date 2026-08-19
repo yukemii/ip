@@ -1,3 +1,5 @@
+package sheppy.task;
+
 /** The fixed set of task types supported by Sheppy. */
 public enum TaskType {
     /** A task without a date or time. */

@@ -1,3 +1,7 @@
+package sheppy.task;
+
+import sheppy.SheppyException;
+
 /** Represents a task without an attached date or time. */
 public class Todo extends Task {
     /**

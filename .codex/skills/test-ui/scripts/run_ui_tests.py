@@ -16,7 +16,7 @@ def main() -> int:
     cases = json.loads(pathlib.Path(sys.argv[1]).read_text())
     classes = pathlib.Path("/tmp/sheppy-ui-classes")
     classes.mkdir(parents=True, exist_ok=True)
-    sources = sorted((root / "src/main/java").glob("*.java"))
+    sources = sorted((root / "src/main/java").rglob("*.java"))
     subprocess.run(["javac", "-d", str(classes), *map(str, sources)],
                    cwd=root, check=True)
 
@@ -31,7 +31,7 @@ def main() -> int:
                 data_file.write_text("\n".join(case["storage"]) + "\n")
             input_text = "\n".join(case["input"]) + "\n"
             result = subprocess.run(
-                ["java", "-cp", str(classes), "Sheppy"],
+                ["java", "-cp", str(classes), "sheppy.Sheppy"],
                 cwd=root,
                 input=input_text,
                 text=True,

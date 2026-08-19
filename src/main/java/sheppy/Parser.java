@@ -1,5 +1,12 @@
+package sheppy;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+
+import sheppy.task.Deadline;
+import sheppy.task.Event;
+import sheppy.task.Task;
+import sheppy.task.Todo;
 
 /** Interprets user commands and creates tasks from them. */
 public class Parser {

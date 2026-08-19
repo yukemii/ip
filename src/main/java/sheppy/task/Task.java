@@ -1,3 +1,7 @@
+package sheppy.task;
+
+import sheppy.SheppyException;
+
 /** Represents a task in Sheppy's task list. */
 public class Task {
     /** The text describing this task. */

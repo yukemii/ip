@@ -1,3 +1,5 @@
+package sheppy;
+
 /** Represents an error caused by invalid Sheppy input. */
 public class SheppyException extends Exception {
     /**

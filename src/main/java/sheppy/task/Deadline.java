@@ -1,6 +1,10 @@
+package sheppy.task;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+
+import sheppy.SheppyException;
 
 /** Represents a task that must be completed by a specified date or time. */
 public class Deadline extends Task {
