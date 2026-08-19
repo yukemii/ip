@@ -35,12 +35,12 @@ public class Sheppy {
         System.out.println("Baa-hello! I'm Sheppy, your woolly little helper.");
         System.out.println("What shall we graze on today?");
 
-        List<Task> tasks;
+        TaskList tasks;
         try {
             tasks = loadTasks();
         } catch (SheppyException exception) {
             System.out.println("Baa-error: " + exception.getMessage());
-            tasks = new ArrayList<>();
+            tasks = new TaskList(List.of());
         }
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNextLine()) {
@@ -52,8 +52,8 @@ public class Sheppy {
                 }
                 if (command.equals("list")) {
                     System.out.println("Here are the tasks in your list:");
-                    for (int i = 0; i < tasks.size(); i++) {
-                        System.out.println((i + 1) + "." + tasks.get(i));
+                    for (int i = 1; i <= tasks.size(); i++) {
+                        System.out.println(i + "." + tasks.get(i));
                     }
                 } else if (command.equals("mark") || command.startsWith("mark ")) {
                     updateTaskStatus(command, tasks, true);
@@ -78,7 +78,7 @@ public class Sheppy {
     }
 
     /** Adds a task to the list and reports the new total. */
-    private static void addTask(Task task, List<Task> tasks) throws SheppyException {
+    private static void addTask(Task task, TaskList tasks) throws SheppyException {
         tasks.add(task);
         saveTasks(tasks);
         System.out.println("Got it. I've added this task:");
@@ -87,7 +87,7 @@ public class Sheppy {
     }
 
     /** Parses and adds a deadline command. */
-    private static void addDeadline(String command, List<Task> tasks)
+    private static void addDeadline(String command, TaskList tasks)
             throws SheppyException {
         String details = command.substring("deadline ".length());
         int separator = details.indexOf(" /by ");
@@ -100,7 +100,7 @@ public class Sheppy {
     }
 
     /** Parses and adds an event command. */
-    private static void addEvent(String command, List<Task> tasks)
+    private static void addEvent(String command, TaskList tasks)
             throws SheppyException {
         String details = command.substring("event ".length());
         int fromSeparator = details.indexOf(" /from ");
@@ -121,29 +121,14 @@ public class Sheppy {
      * @param tasks the current task list
      * @param markDone whether the task should be marked done
     */
-    private static void updateTaskStatus(String command, List<Task> tasks,
+    private static void updateTaskStatus(String command, TaskList tasks,
                                          boolean markDone) throws SheppyException {
-        String[] parts = command.trim().split("\\s+");
-        if (parts.length != 2) {
-            throw new SheppyException("use the command followed by a task number, such as mark 2.");
-        }
-
-        int taskNumber;
-        try {
-            taskNumber = Integer.parseInt(parts[1]);
-        } catch (NumberFormatException exception) {
-            throw new SheppyException("the task number must be a whole number.");
-        }
-        if (taskNumber < 1 || taskNumber > tasks.size()) {
-            throw new SheppyException("that task number is not in your list.");
-        }
-
-        Task task = tasks.get(taskNumber - 1);
+        String commandName = command.trim().split("\\s+")[0];
+        int taskNumber = parseTaskNumber(command, commandName);
+        Task task = tasks.updateStatus(taskNumber, markDone);
         if (markDone) {
-            task.markAsDone();
             System.out.println("Nice! I've marked this task as done:");
         } else {
-            task.markAsUndone();
             System.out.println("OK, I've marked this task as not done yet:");
         }
         saveTasks(tasks);
@@ -151,23 +136,9 @@ public class Sheppy {
     }
 
     /** Deletes a task and reports the remaining total. */
-    private static void deleteTask(String command, List<Task> tasks) throws SheppyException {
-        String[] parts = command.trim().split("\\s+");
-        if (parts.length != 2) {
-            throw new SheppyException("use delete followed by a task number, such as delete 2.");
-        }
-
-        int taskNumber;
-        try {
-            taskNumber = Integer.parseInt(parts[1]);
-        } catch (NumberFormatException exception) {
-            throw new SheppyException("the task number must be a whole number.");
-        }
-        if (taskNumber < 1 || taskNumber > tasks.size()) {
-            throw new SheppyException("that task number is not in your list.");
-        }
-
-        Task deletedTask = tasks.remove(taskNumber - 1);
+    private static void deleteTask(String command, TaskList tasks) throws SheppyException {
+        int taskNumber = parseTaskNumber(command, "delete");
+        Task deletedTask = tasks.remove(taskNumber);
         saveTasks(tasks);
         System.out.println("Noted. I've removed this task:");
         System.out.println("  " + deletedTask);
@@ -180,10 +151,10 @@ public class Sheppy {
      * @param tasks the tasks to save
      * @throws SheppyException if the data directory or file cannot be written
      */
-    private static void saveTasks(List<Task> tasks) throws SheppyException {
+    private static void saveTasks(TaskList tasks) throws SheppyException {
         try {
             Files.createDirectories(DATA_FILE.getParent());
-            List<String> lines = tasks.stream()
+            List<String> lines = tasks.asList().stream()
                     .map(Task::toStorageString)
                     .toList();
             Files.write(DATA_FILE, lines);
@@ -198,10 +169,10 @@ public class Sheppy {
      * @return the tasks saved in the data file, or an empty list if it is absent
      * @throws SheppyException if the file cannot be read or contains invalid data
      */
-    private static List<Task> loadTasks() throws SheppyException {
+    private static TaskList loadTasks() throws SheppyException {
         List<Task> tasks = new ArrayList<>();
         if (!Files.exists(DATA_FILE)) {
-            return tasks;
+            return new TaskList(tasks);
         }
 
         try {
@@ -213,7 +184,7 @@ public class Sheppy {
         } catch (IOException exception) {
             throw new SheppyException("I couldn't load your tasks: " + exception.getMessage());
         }
-        return tasks;
+        return new TaskList(tasks);
     }
 
     /** Parses one task line from the Level 7 storage format. */
@@ -256,6 +227,21 @@ public class Sheppy {
             throws SheppyException {
         if (fields.length != expected) {
             throw new SheppyException("your task file contains the wrong number of fields.");
+        }
+    }
+
+    /** Parses the task number from a mark, unmark, or delete command. */
+    private static int parseTaskNumber(String command, String commandName)
+            throws SheppyException {
+        String[] parts = command.trim().split("\\s+");
+        if (parts.length != 2) {
+            throw new SheppyException("use " + commandName
+                    + " followed by a task number, such as " + commandName + " 2.");
+        }
+        try {
+            return Integer.parseInt(parts[1]);
+        } catch (NumberFormatException exception) {
+            throw new SheppyException("the task number must be a whole number.");
         }
     }
 
