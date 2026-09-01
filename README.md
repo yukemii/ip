@@ -24,6 +24,7 @@ Useful tasks include:
 ./gradlew tasks     # list available tasks
 ./gradlew build     # compile, test, and assemble the project
 ./gradlew test      # run unit tests
+./gradlew checkstyleMain checkstyleTest # check Java coding style
 ./gradlew jar       # create build/libs/sheppy-1.0.jar
 ./gradlew clean     # remove generated build output
 ```
@@ -74,3 +75,15 @@ The Java source follows the SE-EDU basic and intermediate coding conventions:
 
 The `.editorconfig` file records the formatting rules for editors that support
 EditorConfig, including VS Code.
+
+## Checking Java style
+
+Run Checkstyle for both application and test code with:
+
+```bash
+./gradlew checkstyleMain checkstyleTest
+```
+
+The rules in `config/checkstyle/checkstyle.xml` follow the SE-EDU Java coding
+standard used by this project. Checkstyle reports are generated under
+`build/reports/checkstyle/`.

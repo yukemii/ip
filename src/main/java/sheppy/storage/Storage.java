@@ -82,19 +82,19 @@ public class Storage {
         String status = fields[1];
         String description = fields[2];
         Task task = switch (type) {
-        case "T" -> {
-            requireFieldCount(fields, 3);
-            yield new Todo(description);
-        }
-        case "D" -> {
-            requireFieldCount(fields, 4);
-            yield new Deadline(description, parseDate(fields[3]));
-        }
-        case "E" -> {
-            requireFieldCount(fields, 5);
-            yield new Event(description, fields[3], fields[4]);
-        }
-        default -> throw new SheppyException("your task file contains an unknown task type: " + type);
+            case "T" -> {
+                requireFieldCount(fields, 3);
+                yield new Todo(description);
+            }
+            case "D" -> {
+                requireFieldCount(fields, 4);
+                yield new Deadline(description, parseDate(fields[3]));
+            }
+            case "E" -> {
+                requireFieldCount(fields, 5);
+                yield new Event(description, fields[3], fields[4]);
+            }
+            default -> throw new SheppyException("your task file contains an unknown task type: " + type);
         };
 
         if (status.equals("1")) {

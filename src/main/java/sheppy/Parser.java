@@ -52,10 +52,10 @@ public class Parser {
      */
     public static Task parseTask(String command) throws SheppyException {
         return switch (parseCommand(command)) {
-        case TODO -> new Todo(command.substring(4).trim());
-        case DEADLINE -> parseDeadline(command);
-        case EVENT -> parseEvent(command);
-        default -> throw new SheppyException("that is not a task command.");
+            case TODO -> new Todo(command.substring(4).trim());
+            case DEADLINE -> parseDeadline(command);
+            case EVENT -> parseEvent(command);
+            default -> throw new SheppyException("that is not a task command.");
         };
     }
 
