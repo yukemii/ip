@@ -14,11 +14,8 @@ def main() -> int:
 
     root = pathlib.Path(__file__).resolve().parents[4]
     cases = json.loads(pathlib.Path(sys.argv[1]).read_text())
-    classes = pathlib.Path("/tmp/sheppy-ui-classes")
-    classes.mkdir(parents=True, exist_ok=True)
-    sources = sorted((root / "src/main/java").rglob("*.java"))
-    subprocess.run(["javac", "-d", str(classes), *map(str, sources)],
-                   cwd=root, check=True)
+    subprocess.run([str(root / "gradlew"), "classes"], cwd=root, check=True)
+    classes = root / "build/classes/java/main"
 
     data_file = root / "data/tasks.txt"
     saved_data = data_file.read_bytes() if data_file.exists() else None

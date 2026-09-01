@@ -78,3 +78,17 @@ The cases in `test/ui-test-cases.json` are run with the project-specific
 - Input: add tasks containing and not containing `book`, then run `find book`.
 - Expected: the matching tasks are displayed under the matching-tasks heading
   in their original order.
+
+## Level 10 JavaFX GUI
+
+- Aim: provide a graphical interface without changing Sheppy's command
+  behavior or removing the command-line interface used by scripted tests.
+- Launch: run `./gradlew run` and confirm that a window titled `Sheppy` opens.
+- Input: enter commands using both the Enter key and the Send button.
+- Expected: each user command and Sheppy response appears in a separate,
+  readable dialogue box; the newest exchange remains visible as the dialogue
+  grows; all existing commands still produce their normal responses.
+- Exit: enter `bye` and confirm that Sheppy shows its farewell before the
+  window closes.
+- Regression: run every scripted text-UI case to verify that the reusable
+  chatbot logic still supports the command-line interface.
