@@ -8,8 +8,41 @@ import sheppy.task.TaskList;
 
 /** Coordinates Sheppy's user interface, parser, task list, and storage. */
 public class Sheppy {
-    /** Prevents instantiation of this command-line application class. */
-    private Sheppy() {
+    /** The default location used to save tasks. */
+    private static final String DEFAULT_FILE_PATH = "data/tasks.txt";
+
+    /** Stores tasks between application sessions. */
+    private final Storage storage;
+
+    /** Contains the tasks in the current session. */
+    private final TaskList tasks;
+
+    /** Contains a loading error to show after startup, or an empty string. */
+    private final String startupMessage;
+
+    /** Creates Sheppy using the default task-data file. */
+    public Sheppy() {
+        this(DEFAULT_FILE_PATH);
+    }
+
+    /**
+     * Creates Sheppy using a specified task-data file.
+     *
+     * @param filePath the path of the task-data file
+     */
+    public Sheppy(String filePath) {
+        storage = new Storage(filePath);
+
+        TaskList loadedTasks;
+        String loadingMessage = "";
+        try {
+            loadedTasks = storage.load();
+        } catch (SheppyException exception) {
+            loadedTasks = new TaskList(List.of());
+            loadingMessage = formatError(exception.getMessage());
+        }
+        tasks = loadedTasks;
+        startupMessage = loadingMessage;
     }
 
     /**
@@ -19,71 +52,109 @@ public class Sheppy {
      */
     public static void main(String[] args) {
         Ui ui = new Ui();
+        Sheppy sheppy = new Sheppy();
         ui.showWelcome();
-
-        Storage storage = new Storage("data/tasks.txt");
-        TaskList tasks;
-        try {
-            tasks = storage.load();
-        } catch (SheppyException exception) {
-            ui.showError(exception.getMessage());
-            tasks = new TaskList(List.of());
+        if (!sheppy.getStartupMessage().isEmpty()) {
+            ui.showResponse(sheppy.getStartupMessage());
         }
 
         while (ui.hasNextCommand()) {
             String command = ui.readCommand();
-            try {
-                CommandType commandType = Parser.parseCommand(command);
-                if (commandType == CommandType.BYE) {
-                    ui.showBye();
-                    return;
-                } else if (commandType == CommandType.LIST) {
-                    ui.showTasks(tasks);
-                } else if (commandType == CommandType.FIND) {
-                    String keyword = Parser.parseFindKeyword(command);
-                    ui.showMatchingTasks(tasks.find(keyword));
-                } else if (commandType == CommandType.MARK) {
-                    updateTaskStatus(command, tasks, storage, ui, true);
-                } else if (commandType == CommandType.UNMARK) {
-                    updateTaskStatus(command, tasks, storage, ui, false);
-                } else if (commandType == CommandType.DELETE) {
-                    deleteTask(command, tasks, storage, ui);
-                } else if (commandType == CommandType.TODO
-                        || commandType == CommandType.DEADLINE
-                        || commandType == CommandType.EVENT) {
-                    addTask(Parser.parseTask(command), tasks, storage, ui);
-                } else {
-                    throw Parser.unknownCommand();
-                }
-            } catch (SheppyException exception) {
-                ui.showError(exception.getMessage());
+            ui.showResponse(sheppy.getResponse(command));
+            if (sheppy.isExitCommand(command)) {
+                return;
             }
         }
     }
 
-    /** Adds a task, saves the updated list, and displays a confirmation. */
-    private static void addTask(Task task, TaskList tasks, Storage storage, Ui ui)
-            throws SheppyException {
-        tasks.add(task);
-        storage.save(tasks);
-        ui.showTaskAdded(task, tasks.size());
+    /**
+     * Returns any message produced while loading saved tasks.
+     *
+     * @return the startup error, or an empty string if loading succeeded
+     */
+    public String getStartupMessage() {
+        return startupMessage;
     }
 
-    /** Updates a task's completion status, saves it, and displays a confirmation. */
-    private static void updateTaskStatus(String command, TaskList tasks, Storage storage,
-                                         Ui ui, boolean markDone) throws SheppyException {
+    /**
+     * Returns Sheppy's response to one user command.
+     *
+     * @param command the command entered by the user
+     * @return Sheppy's response, including any validation error
+     */
+    public String getResponse(String command) {
+        try {
+            CommandType commandType = Parser.parseCommand(command);
+            return switch (commandType) {
+                case BYE -> "Baa-bye! Keep your thoughts cozy and your tasks tidy.";
+                case LIST -> formatTasks("Here are the tasks in your list:", tasks.asList());
+                case FIND -> formatTasks("Here are the matching tasks in your list:",
+                        tasks.find(Parser.parseFindKeyword(command)));
+                case MARK -> updateTaskStatus(command, true);
+                case UNMARK -> updateTaskStatus(command, false);
+                case DELETE -> deleteTask(command);
+                case TODO, DEADLINE, EVENT -> addTask(Parser.parseTask(command));
+                case UNKNOWN -> throw Parser.unknownCommand();
+            };
+        } catch (SheppyException exception) {
+            return formatError(exception.getMessage());
+        }
+    }
+
+    /**
+     * Checks whether a command tells Sheppy to exit.
+     *
+     * @param command the command entered by the user
+     * @return true if the command is {@code bye}
+     */
+    public boolean isExitCommand(String command) {
+        return Parser.parseCommand(command) == CommandType.BYE;
+    }
+
+    /** Adds a task, saves the updated list, and returns a confirmation. */
+    private String addTask(Task task) throws SheppyException {
+        tasks.add(task);
+        storage.save(tasks);
+        return "Got it. I've added this task:\n"
+                + "  " + task + "\n"
+                + "Now you have " + tasks.size() + " tasks in the list.";
+    }
+
+    /** Updates a task's completion status, saves it, and returns a confirmation. */
+    private String updateTaskStatus(String command, boolean markDone) throws SheppyException {
         int taskNumber = Parser.parseTaskNumber(command);
         Task task = tasks.updateStatus(taskNumber, markDone);
         storage.save(tasks);
-        ui.showTaskStatus(task, markDone);
+        String confirmation = markDone
+                ? "Nice! I've marked this task as done:"
+                : "OK, I've marked this task as not done yet:";
+        return confirmation + "\n  " + task;
     }
 
-    /** Deletes a task, saves the updated list, and displays a confirmation. */
-    private static void deleteTask(String command, TaskList tasks, Storage storage, Ui ui)
-            throws SheppyException {
+    /** Deletes a task, saves the updated list, and returns a confirmation. */
+    private String deleteTask(String command) throws SheppyException {
         int taskNumber = Parser.parseTaskNumber(command);
         Task deletedTask = tasks.remove(taskNumber);
         storage.save(tasks);
-        ui.showTaskDeleted(deletedTask, tasks.size());
+        return "Noted. I've removed this task:\n"
+                + "  " + deletedTask + "\n"
+                + "Now you have " + tasks.size() + " tasks in the list.";
+    }
+
+    /** Formats a numbered collection of tasks under a heading. */
+    private String formatTasks(String heading, List<Task> displayedTasks) {
+        StringBuilder response = new StringBuilder(heading);
+        for (int i = 0; i < displayedTasks.size(); i++) {
+            response.append(System.lineSeparator())
+                    .append(i + 1)
+                    .append('.')
+                    .append(displayedTasks.get(i));
+        }
+        return response.toString();
+    }
+
+    /** Formats an exception message using Sheppy's error prefix. */
+    private String formatError(String message) {
+        return "Baa-error: " + message;
     }
 }

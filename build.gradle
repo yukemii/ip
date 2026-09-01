@@ -11,6 +11,21 @@ repositories {
 }
 
 dependencies {
+    def javaFxVersion = '17.0.7'
+
+    implementation "org.openjfx:javafx-base:${javaFxVersion}:win"
+    implementation "org.openjfx:javafx-base:${javaFxVersion}:mac"
+    implementation "org.openjfx:javafx-base:${javaFxVersion}:linux"
+    implementation "org.openjfx:javafx-controls:${javaFxVersion}:win"
+    implementation "org.openjfx:javafx-controls:${javaFxVersion}:mac"
+    implementation "org.openjfx:javafx-controls:${javaFxVersion}:linux"
+    implementation "org.openjfx:javafx-fxml:${javaFxVersion}:win"
+    implementation "org.openjfx:javafx-fxml:${javaFxVersion}:mac"
+    implementation "org.openjfx:javafx-fxml:${javaFxVersion}:linux"
+    implementation "org.openjfx:javafx-graphics:${javaFxVersion}:win"
+    implementation "org.openjfx:javafx-graphics:${javaFxVersion}:mac"
+    implementation "org.openjfx:javafx-graphics:${javaFxVersion}:linux"
+
     testImplementation platform('org.junit:junit-bom:5.13.4')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -23,7 +38,8 @@ java {
 }
 
 application {
-    mainClass = 'sheppy.Sheppy'
+    mainClass = 'sheppy.gui.Launcher'
+    applicationDefaultJvmArgs = ['--enable-native-access=javafx.graphics']
 }
 
 checkstyle {
@@ -32,10 +48,6 @@ checkstyle {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-}
-
-tasks.named('run') {
-    standardInput = System.in
 }
 
 tasks.named('jar') {
