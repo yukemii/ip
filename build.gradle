@@ -1,5 +1,6 @@
 plugins {
     id 'application'
+    id 'checkstyle'
 }
 
 group = 'sheppy'
@@ -23,6 +24,10 @@ java {
 
 application {
     mainClass = 'sheppy.Sheppy'
+}
+
+checkstyle {
+    toolVersion = '11.0.0'
 }
 
 tasks.withType(JavaCompile).configureEach {
