@@ -38,7 +38,7 @@ public class Sheppy {
         try {
             loadedTasks = storage.load();
         } catch (SheppyException exception) {
-            loadedTasks = new TaskList(List.of());
+            loadedTasks = new TaskList();
             loadingMessage = formatError(exception.getMessage());
         }
         tasks = loadedTasks;

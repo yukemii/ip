@@ -14,7 +14,7 @@ class TaskListTest {
     /** Checks that tasks are added and retrieved using one-based numbering. */
     @Test
     void addAndGet_usesOneBasedTaskNumbers() throws SheppyException {
-        TaskList tasks = new TaskList(List.of());
+        TaskList tasks = new TaskList();
         Todo todo = new Todo("read book");
 
         tasks.add(todo);
@@ -26,7 +26,7 @@ class TaskListTest {
     /** Checks that a task can be marked done and then marked undone. */
     @Test
     void updateStatus_changesCompletionMarker() throws SheppyException {
-        TaskList tasks = new TaskList(List.of(new Todo("read book")));
+        TaskList tasks = new TaskList(new Todo("read book"));
 
         tasks.updateStatus(1, true);
         assertEquals("X", tasks.get(1).getStatusIcon());
@@ -38,7 +38,7 @@ class TaskListTest {
     /** Checks that removing a task returns it and reduces the list size. */
     @Test
     void remove_returnsTaskAndReducesSize() throws SheppyException {
-        TaskList tasks = new TaskList(List.of(new Todo("read book"), new Todo("return book")));
+        TaskList tasks = new TaskList(new Todo("read book"), new Todo("return book"));
 
         Task removed = tasks.remove(1);
 
@@ -50,7 +50,7 @@ class TaskListTest {
     /** Checks that task numbers outside the list are rejected. */
     @Test
     void get_outOfRangeNumberThrowsSheppyException() throws SheppyException {
-        TaskList tasks = new TaskList(List.of(new Todo("read book")));
+        TaskList tasks = new TaskList(new Todo("read book"));
 
         assertThrows(SheppyException.class, () -> tasks.get(0));
         assertThrows(SheppyException.class, () -> tasks.get(2));
@@ -59,8 +59,8 @@ class TaskListTest {
     /** Checks that find returns matching tasks in their original order. */
     @Test
     void find_keywordReturnsMatchingTasks() throws SheppyException {
-        TaskList tasks = new TaskList(List.of(new Todo("read book"), new Todo("exercise"),
-                new Todo("return book")));
+        TaskList tasks = new TaskList(new Todo("read book"), new Todo("exercise"),
+                new Todo("return book"));
 
         List<Task> matchingTasks = tasks.find("book");
 
