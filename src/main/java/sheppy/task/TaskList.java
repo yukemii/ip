@@ -12,6 +12,15 @@ public class TaskList {
     private final List<Task> tasks;
 
     /**
+     * Creates a task list using zero or more supplied tasks.
+     *
+     * @param initialTasks the tasks to place in the list
+     */
+    public TaskList(Task... initialTasks) {
+        this(List.of(initialTasks));
+    }
+
+    /**
      * Creates a task list using the supplied initial tasks.
      *
      * @param initialTasks tasks loaded from storage, if any
