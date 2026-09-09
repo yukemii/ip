@@ -3,7 +3,7 @@ package sheppy.task;
 import sheppy.SheppyException;
 
 /** Represents a task in Sheppy's task list. */
-public class Task {
+public abstract class Task {
     /** The text describing this task. */
     private final String description;
 
@@ -57,9 +57,7 @@ public class Task {
      *
      * @return this task's type
      */
-    public TaskType getTaskType() {
-        return TaskType.TODO;
-    }
+    public abstract TaskType getTaskType();
 
     /**
      * Returns the task's complete display description.
