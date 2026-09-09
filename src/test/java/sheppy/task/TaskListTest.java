@@ -23,6 +23,14 @@ class TaskListTest {
         assertEquals(todo, tasks.get(1));
     }
 
+    /** Checks that the task list rejects a null task as a programming error. */
+    @Test
+    void add_nullTaskThrowsAssertionError() {
+        TaskList tasks = new TaskList();
+
+        assertThrows(AssertionError.class, () -> tasks.add(null));
+    }
+
     /** Checks that a task can be marked done and then marked undone. */
     @Test
     void updateStatus_changesCompletionMarker() throws SheppyException {

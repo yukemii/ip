@@ -35,6 +35,7 @@ public class TaskList {
      * @param task the task to add
      */
     public void add(Task task) {
+        assert task != null : "Task to add must not be null";
         tasks.add(task);
     }
 
@@ -113,6 +114,8 @@ public class TaskList {
         if (taskNumber < 1 || taskNumber > tasks.size()) {
             throw new SheppyException("that task number is not in your list.");
         }
-        return taskNumber - 1;
+        int index = taskNumber - 1;
+        assert index >= 0 && index < tasks.size() : "Validated task number must map to a valid index";
+        return index;
     }
 }
