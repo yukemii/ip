@@ -13,4 +13,10 @@ public class Todo extends Task {
     public Todo(String description) throws SheppyException {
         super(description);
     }
+
+    /** @return the to-do task type */
+    @Override
+    public TaskType getTaskType() {
+        return TaskType.TODO;
+    }
 }
