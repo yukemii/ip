@@ -1,6 +1,7 @@
 plugins {
     id 'application'
     id 'checkstyle'
+    id 'com.gradleup.shadow' version '9.5.1'
 }
 
 group = 'sheppy'
@@ -54,6 +55,10 @@ tasks.named('jar') {
     manifest {
         attributes('Main-Class': application.mainClass.get())
     }
+}
+
+shadowJar {
+    archiveFileName = 'sheppy.jar'
 }
 
 tasks.named('test') {
