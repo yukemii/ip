@@ -136,5 +136,29 @@
       "1.[T][ ] read book",
       "2.[D][ ] return book (by: Oct 15 2019)"
     ]
+  },
+  {
+    "name": "C-Sort orders and saves tasks",
+    "input": [
+      "todo Write report",
+      "todo buy milk",
+      "todo Attend meeting",
+      "sort",
+      "list",
+      "bye"
+    ],
+    "expected": [
+      "All sorted! Here are your tasks in alphabetical order:",
+      "1.[T][ ] Attend meeting\n2.[T][ ] buy milk\n3.[T][ ] Write report",
+      "Here are the tasks in your list:"
+    ]
+  },
+  {
+    "name": "C-Sort handles an empty list",
+    "input": ["sort", "list", "bye"],
+    "expected": [
+      "All sorted! Here are your tasks in alphabetical order:",
+      "Here are the tasks in your list:"
+    ]
   }
 ]

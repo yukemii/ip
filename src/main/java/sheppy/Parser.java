@@ -29,6 +29,8 @@ public class Parser {
             return CommandType.LIST;
         } else if (command.equals("find") || command.startsWith("find ")) {
             return CommandType.FIND;
+        } else if (command.equals("sort")) {
+            return CommandType.SORT;
         } else if (command.equals("mark") || command.startsWith("mark ")) {
             return CommandType.MARK;
         } else if (command.equals("unmark") || command.startsWith("unmark ")) {
@@ -130,7 +132,8 @@ public class Parser {
      */
     public static SheppyException unknownCommand() {
         return new SheppyException(
-                "I don't recognize that command. Try todo, deadline, event, list, find, mark, unmark, or delete.");
+                "I don't recognize that command. Try todo, deadline, event, list, find, sort, "
+                        + "mark, unmark, or delete.");
     }
 
     /** Parses a date entered in the Level 8 ISO format. */

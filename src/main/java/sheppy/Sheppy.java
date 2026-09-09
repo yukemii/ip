@@ -92,6 +92,7 @@ public class Sheppy {
                 case LIST -> formatTasks("Here are the tasks in your list:", tasks.asList());
                 case FIND -> formatTasks("Here are the matching tasks in your list:",
                         tasks.find(Parser.parseFindKeyword(command)));
+                case SORT -> sortTasks();
                 case MARK -> updateTaskStatus(command, true);
                 case UNMARK -> updateTaskStatus(command, false);
                 case DELETE -> deleteTask(command);
@@ -141,6 +142,13 @@ public class Sheppy {
         return "Noted. I've removed this task:\n"
                 + "  " + deletedTask + "\n"
                 + "Now you have " + tasks.size() + " tasks in the list.";
+    }
+
+    /** Sorts tasks alphabetically, saves the new order, and returns the sorted list. */
+    private String sortTasks() throws SheppyException {
+        tasks.sortByDescription();
+        storage.save(tasks);
+        return formatTasks("All sorted! Here are your tasks in alphabetical order:", tasks.asList());
     }
 
     /** Formats a numbered collection of tasks under a heading. */

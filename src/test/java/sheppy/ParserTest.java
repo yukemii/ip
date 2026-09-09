@@ -20,6 +20,7 @@ class ParserTest {
         assertEquals(CommandType.DEADLINE, Parser.parseCommand("deadline report /by 2025-01-01"));
         assertEquals(CommandType.EVENT, Parser.parseCommand("event meeting /from 2pm /to 4pm"));
         assertEquals(CommandType.FIND, Parser.parseCommand("find book"));
+        assertEquals(CommandType.SORT, Parser.parseCommand("sort"));
         assertEquals(CommandType.UNKNOWN, Parser.parseCommand("schedule meeting"));
     }
 

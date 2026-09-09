@@ -74,4 +74,17 @@ class TaskListTest {
 
         assertEquals(List.of(tasks.get(1), tasks.get(3)), matchingTasks);
     }
+
+    /** Checks that sorting orders descriptions alphabetically without regard to case. */
+    @Test
+    void sortByDescription_mixedCaseDescriptionsSortAlphabetically() throws SheppyException {
+        TaskList tasks = new TaskList(new Todo("Write report"), new Todo("buy milk"),
+                new Todo("Attend meeting"));
+
+        tasks.sortByDescription();
+
+        assertEquals("Attend meeting", tasks.get(1).getDescription());
+        assertEquals("buy milk", tasks.get(2).getDescription());
+        assertEquals("Write report", tasks.get(3).getDescription());
+    }
 }
