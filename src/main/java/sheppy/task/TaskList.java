@@ -2,6 +2,7 @@ package sheppy.task;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import sheppy.SheppyException;
@@ -107,6 +108,12 @@ public class TaskList {
         return tasks.stream()
                 .filter(task -> task.getDescription().contains(keyword))
                 .toList();
+    }
+
+    /** Sorts tasks alphabetically by description, ignoring letter case. */
+    public void sortByDescription() {
+        tasks.sort(Comparator.comparing(Task::getDescription, String.CASE_INSENSITIVE_ORDER)
+                .thenComparing(Task::getDescription));
     }
 
     /** Converts a user-facing one-based number into an internal index. */

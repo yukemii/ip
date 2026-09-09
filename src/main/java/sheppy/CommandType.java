@@ -11,6 +11,9 @@ public enum CommandType {
     /** Find tasks whose descriptions contain a keyword. */
     FIND,
 
+    /** Sort tasks alphabetically by description. */
+    SORT,
+
     /** Add a todo task. */
     TODO,
 

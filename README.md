@@ -18,6 +18,18 @@ Gradle version automatically:
 The `run` task keeps the terminal connected to Sheppy's input. Type commands
 such as `list` or `bye` as usual.
 
+## Commands
+
+- `todo DESCRIPTION` adds a todo.
+- `deadline DESCRIPTION /by yyyy-MM-dd` adds a deadline.
+- `event DESCRIPTION /from START /to END` adds an event.
+- `list` displays all tasks.
+- `find KEYWORD` displays tasks containing the keyword.
+- `sort` orders tasks alphabetically by description and saves the new order.
+- `mark NUMBER` and `unmark NUMBER` update a task's completion status.
+- `delete NUMBER` removes a task.
+- `bye` exits Sheppy.
+
 Useful tasks include:
 
 ```bash

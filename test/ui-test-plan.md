@@ -92,3 +92,11 @@ The cases in `test/ui-test-cases.json` are run with the project-specific
   window closes.
 - Regression: run every scripted text-UI case to verify that the reusable
   chatbot logic still supports the command-line interface.
+
+## C-Sort extension
+
+- Aim: sort all tasks alphabetically by description without regard to letter
+  case and save the new order.
+- Input: add tasks in a non-alphabetical order, run `sort`, then run `list`.
+- Expected: both the sort response and the later list display the tasks in
+  alphabetical order. Sorting an empty list succeeds and leaves it empty.
