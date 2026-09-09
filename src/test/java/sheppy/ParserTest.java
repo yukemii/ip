@@ -23,6 +23,12 @@ class ParserTest {
         assertEquals(CommandType.UNKNOWN, Parser.parseCommand("schedule meeting"));
     }
 
+    /** Checks that the parser's non-null command assumption is documented. */
+    @Test
+    void parseCommand_nullCommandThrowsAssertionError() {
+        assertThrows(AssertionError.class, () -> Parser.parseCommand(null));
+    }
+
     /** Checks that a todo command produces a Todo task. */
     @Test
     void parseTask_todoCommandCreatesTodo() throws SheppyException {
