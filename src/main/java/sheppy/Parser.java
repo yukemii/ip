@@ -21,6 +21,8 @@ public class Parser {
      * @return the matching command type, or {@link CommandType#UNKNOWN}
      */
     public static CommandType parseCommand(String command) {
+        assert command != null : "Command to parse must not be null";
+
         if (command.equals("bye")) {
             return CommandType.BYE;
         } else if (command.equals("list")) {
