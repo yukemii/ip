@@ -1,6 +1,8 @@
 package sheppy;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import sheppy.storage.Storage;
 import sheppy.task.Task;
@@ -143,14 +145,13 @@ public class Sheppy {
 
     /** Formats a numbered collection of tasks under a heading. */
     private String formatTasks(String heading, List<Task> displayedTasks) {
-        StringBuilder response = new StringBuilder(heading);
-        for (int i = 0; i < displayedTasks.size(); i++) {
-            response.append(System.lineSeparator())
-                    .append(i + 1)
-                    .append('.')
-                    .append(displayedTasks.get(i));
-        }
-        return response.toString();
+        String lineSeparator = System.lineSeparator();
+        String formattedTasks = IntStream.range(0, displayedTasks.size())
+                .mapToObj(index -> (index + 1) + "." + displayedTasks.get(index))
+                .collect(Collectors.joining(lineSeparator));
+        return formattedTasks.isEmpty()
+                ? heading
+                : heading + lineSeparator + formattedTasks;
     }
 
     /** Formats an exception message using Sheppy's error prefix. */
