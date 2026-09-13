@@ -1,5 +1,13 @@
 # Sheppy UI test plan
 
+## More error handling
+
+- Aim: recover from bare task commands, repeated markers and reserved storage characters.
+- Input: interleave `deadline`, `event`, malformed events and valid todos, then list.
+- Expected: errors do not terminate the session or change existing tasks; extra whitespace is accepted.
+- Storage regression tests simulate failed saves and verify rollback, and ensure corrupt files remain untouched.
+- Recovery: back up and repair unreadable data, then restart before modifying tasks.
+
 ## Welcome banner
 
 - Aim: display a readable ASCII banner for Sheppy when the application starts.

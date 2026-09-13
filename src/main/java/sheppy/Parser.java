@@ -22,6 +22,7 @@ public class Parser {
      */
     public static CommandType parseCommand(String command) {
         assert command != null : "Command to parse must not be null";
+        command = normalize(command);
 
         if (command.equals("bye")) {
             return CommandType.BYE;
@@ -55,6 +56,10 @@ public class Parser {
      * @throws SheppyException if the command is malformed
      */
     public static Task parseTask(String command) throws SheppyException {
+        command = normalize(command);
+        if (command.contains("|")) {
+            throw new SheppyException("please remove | from task details; it is reserved for saved data.");
+        }
         return switch (parseCommand(command)) {
             case TODO -> new Todo(command.substring(4).trim());
             case DEADLINE -> parseDeadline(command);
@@ -65,11 +70,12 @@ public class Parser {
 
     /** Parses a deadline command. */
     private static Deadline parseDeadline(String command) throws SheppyException {
-        String details = command.substring("deadline ".length());
+        String details = command.substring("deadline".length()).trim();
         int separator = details.indexOf(" /by ");
         if (separator < 0) {
             throw new SheppyException("a deadline needs a description and a /by date or time.");
         }
+        requireSingleMarker(details, "/by");
         String description = details.substring(0, separator).trim();
         String by = details.substring(separator + " /by ".length()).trim();
         return new Deadline(description, parseDate(by));
@@ -77,12 +83,14 @@ public class Parser {
 
     /** Parses an event command. */
     private static Event parseEvent(String command) throws SheppyException {
-        String details = command.substring("event ".length());
+        String details = command.substring("event".length()).trim();
         int fromSeparator = details.indexOf(" /from ");
         int toSeparator = details.indexOf(" /to ");
         if (fromSeparator < 0 || toSeparator < 0 || toSeparator < fromSeparator) {
             throw new SheppyException("an event needs a description, /from time, and /to time.");
         }
+        requireSingleMarker(details, "/from");
+        requireSingleMarker(details, "/to");
         String description = details.substring(0, fromSeparator).trim();
         String from = details.substring(fromSeparator + " /from ".length(), toSeparator).trim();
         String to = details.substring(toSeparator + " /to ".length()).trim();
@@ -118,6 +126,7 @@ public class Parser {
      * @throws SheppyException if the keyword is empty
      */
     public static String parseFindKeyword(String command) throws SheppyException {
+        command = normalize(command);
         String keyword = command.substring("find".length()).trim();
         if (keyword.isEmpty()) {
             throw new SheppyException("find needs a keyword to search for.");
@@ -142,6 +151,25 @@ public class Parser {
             return LocalDate.parse(value);
         } catch (DateTimeParseException exception) {
             throw new SheppyException("please use dates in yyyy-MM-dd format, such as 2019-10-15.");
+        }
+    }
+
+    /**
+     * Normalizes incidental whitespace in a command.
+     *
+     * @param command the raw command
+     * @return the trimmed command with whitespace runs replaced by spaces
+     */
+    public static String normalize(String command) {
+        return command.trim().replaceAll("\\s+", " ");
+    }
+
+    /** Rejects repeated date/time markers rather than treating them as task text. */
+    private static void requireSingleMarker(String details, String marker) throws SheppyException {
+        long count = java.util.Arrays.stream(details.split(" "))
+                .filter(marker::equals).count();
+        if (count != 1) {
+            throw new SheppyException("use " + marker + " exactly once.");
         }
     }
 }

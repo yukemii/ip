@@ -20,6 +20,13 @@ such as `list` or `bye` as usual.
 
 ## Commands
 
+Commands accept leading/trailing whitespace and repeated spaces or tabs.
+Use each `/by`, `/from`, and `/to` marker only once in its command.
+The `|` character is reserved for saved data and cannot appear in task commands.
+Failed saves leave the previous task list intact. If loading fails, back up
+and repair `data/tasks.txt`, then restart Sheppy before changing tasks.
+Saving requires a filesystem that supports atomic replacement of files.
+
 - `todo DESCRIPTION` adds a todo.
 - `deadline DESCRIPTION /by yyyy-MM-dd` adds a deadline.
 - `event DESCRIPTION /from START /to END` adds an event.
