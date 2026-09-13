@@ -3,6 +3,7 @@ package sheppy.storage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -36,14 +37,27 @@ public class Storage {
      * @throws SheppyException if the directory or file cannot be written
      */
     public void save(TaskList tasks) throws SheppyException {
+        Path temporaryFile = null;
         try {
-            Files.createDirectories(filePath.getParent());
+            Path destination = filePath.toAbsolutePath();
+            Files.createDirectories(destination.getParent());
             List<String> lines = tasks.asList().stream()
                     .map(Task::toStorageString)
                     .toList();
-            Files.write(filePath, lines);
+            temporaryFile = Files.createTempFile(destination.getParent(), "sheppy-", ".tmp");
+            Files.write(temporaryFile, lines);
+            Files.move(temporaryFile, destination, StandardCopyOption.ATOMIC_MOVE,
+                    StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException exception) {
             throw new SheppyException("I couldn't save your tasks: " + exception.getMessage());
+        } finally {
+            if (temporaryFile != null) {
+                try {
+                    Files.deleteIfExists(temporaryFile);
+                } catch (IOException exception) {
+                    // A leftover temporary file is safer than risking the original task file.
+                }
+            }
         }
     }
 

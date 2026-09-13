@@ -1,5 +1,6 @@
 package sheppy;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -17,7 +18,7 @@ public class Sheppy {
     private final Storage storage;
 
     /** Contains the tasks in the current session. */
-    private final TaskList tasks;
+    private TaskList tasks;
 
     /** Contains a loading error to show after startup, or an empty string. */
     private final String startupMessage;
@@ -85,8 +86,20 @@ public class Sheppy {
      * @return Sheppy's response, including any validation error
      */
     public String getResponse(String command) {
+        List<Task> previousTasks = new ArrayList<>(tasks.asList());
+        List<String> previousStatuses = previousTasks.stream().map(Task::getStatusIcon).toList();
         try {
+            command = Parser.normalize(command);
+            if (command.isEmpty()) {
+                throw new SheppyException("please enter a command, such as list.");
+            }
             CommandType commandType = Parser.parseCommand(command);
+            if (!startupMessage.isEmpty() && commandType != CommandType.LIST
+                    && commandType != CommandType.FIND && commandType != CommandType.BYE
+                    && commandType != CommandType.UNKNOWN) {
+                throw new SheppyException("your data could not be loaded. Back up and repair the data file, "
+                        + "then restart Sheppy before changing tasks.");
+            }
             return switch (commandType) {
                 case BYE -> "Baa-bye! Keep your thoughts cozy and your tasks tidy.";
                 case LIST -> formatTasks("Here are the tasks in your list:", tasks.asList());
@@ -100,6 +113,14 @@ public class Sheppy {
                 case UNKNOWN -> throw Parser.unknownCommand();
             };
         } catch (SheppyException exception) {
+            tasks = new TaskList(previousTasks);
+            for (int index = 0; index < previousTasks.size(); index++) {
+                if (previousStatuses.get(index).equals("X")) {
+                    previousTasks.get(index).markAsDone();
+                } else {
+                    previousTasks.get(index).markAsUndone();
+                }
+            }
             return formatError(exception.getMessage());
         }
     }
