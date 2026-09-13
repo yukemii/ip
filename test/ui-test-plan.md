@@ -1,5 +1,13 @@
 # Sheppy UI test plan
 
+## More automated testing
+
+- JUnit covers model validation and serialization, parser boundaries, all task types,
+  blank and corrupt files, Unicode round trips, empty saves and failed file replacement.
+- Integration tests mix valid and invalid commands, then restart to check persisted state.
+- Ordered UI assertions cover sorting followed by mark/delete and rejected task numbers.
+- GUI layout, resizing and other operating systems still require manual testing.
+
 ## More error handling
 
 - Aim: recover from bare task commands, repeated markers and reserved storage characters.

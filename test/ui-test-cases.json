@@ -1,5 +1,10 @@
 [
   {
+    "name": "Mixed commands retain sorted numbering",
+    "input": ["todo zebra", "todo apple", "sort", "mark 1", "delete 3", "delete 2", "list", "bye"],
+    "expected": ["Nice! I've marked this task as done:\n  [T][X] apple", "Baa-error: that task number is not in your list.", "Here are the tasks in your list:\n1.[T][X] apple"]
+  },
+  {
     "name": "More error handling recovery",
     "input": ["deadline", "event", "todo safe", "todo x | y", "event x /from Mon /to Tue /to Wed", "  list  ", "bye"],
     "expected": ["Baa-error: a deadline needs", "Baa-error: an event needs", "please remove |", "use /to exactly once.", "Here are the tasks in your list:\n1.[T][ ] safe"]
