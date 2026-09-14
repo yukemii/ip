@@ -1,5 +1,7 @@
 # Sheppy User Guide
 
+![Sheppy task manager window showing tasks and a chat command](Ui.png)
+
 Sheppy is your woolly task helper: a desktop chat app for todos, deadlines
 and events. Enter a command and press **Enter** or click **Send**.
 
