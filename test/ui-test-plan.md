@@ -1,5 +1,14 @@
 # Sheppy UI test plan
 
+## Empty-state feedback
+
+- `list` on a new or emptied list explains that the meadow is empty and how to add tasks.
+- `sort` on an empty list says there is nothing to sort and does not write storage.
+- Interleave list/sort, add, delete-last-task, and invalid numbered commands;
+  confirm that valid commands still work afterward. JUnit also checks restart behavior.
+- `find` with no matches retains its existing helpful response.
+- After a load failure, list/find report unavailable data, not an empty list or no matches.
+
 ## Finalization regression checks
 
 - Each CLI test runs in its own temporary working directory; real task data is never touched.
@@ -88,7 +97,7 @@ The cases in `test/ui-test-cases.json` are run with the project-specific
   crashing.
 - Fixtures: unknown task type, invalid completion status, and incomplete task
   fields.
-- Expected: a specific `Baa-error:` message followed by an empty task list.
+- Expected: a specific `Baa-error:` message; list/find explain that tasks are unavailable.
 
 ## Level 8 typed deadline dates
 

@@ -73,7 +73,9 @@ After adding the examples above, the entries are:
 3.[E][ ] project meeting (from: Monday 2pm to: Monday 4pm)
 ```
 
-An empty list shows the heading without task entries.
+An empty list shows: "Your meadow is empty! Add a task with todo, deadline, or event."
+If your saved data could not be loaded, Sheppy reports that tasks are unavailable
+instead of presenting them as an empty list.
 
 ## Finding tasks
 
@@ -112,7 +114,8 @@ and re-add a task if you delete it by mistake.
 `sort` orders all tasks alphabetically by description, ignoring letter case,
 and saves the new order. It does not sort by date or completion status.
 Descriptions differing only in letter case use case-sensitive ordering to
-break ties. An empty list can also be sorted.
+break ties. An empty list produces "Nothing to sort yet" and guidance for adding
+tasks, without creating or rewriting the task file.
 
 Numbers can change after sorting. Use `list` before your next numbered command.
 
@@ -134,8 +137,8 @@ Restart from the same working folder to load them; no save command is needed.
   and disk space, then retry. Saving requires atomic file replacement;
   use a normal local folder if your filesystem does not support it.
 - **Load error:** Sheppy reports the problem and blocks changes to protect
-  existing data. Back up and repair the file, then restart. The empty displayed
-  list after a load error does not mean your saved data was deleted.
+  existing data. Back up and repair the file, then restart. `list` and `find`
+  report that tasks are unavailable; this does not mean your saved data was deleted.
 - **Start fresh:** close Sheppy, move the task file to a backup location, and
   restart. Only do this if you want an empty list.
 

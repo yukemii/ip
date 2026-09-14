@@ -13,6 +13,10 @@ public class Sheppy {
     /** The default location used to save tasks. */
     private static final String DEFAULT_FILE_PATH = "data/tasks.txt";
 
+    /** Suggests how to start when there are no tasks to display. */
+    private static final String EMPTY_LIST_MESSAGE =
+            "Your meadow is empty! Add a task with todo, deadline, or event.";
+
     /** Stores tasks between application sessions. */
     private final Storage storage;
 
@@ -95,6 +99,10 @@ public class Sheppy {
                 throw new SheppyException("please enter a command, such as list.");
             }
             CommandType commandType = Parser.parseCommand(command);
+            if (!storageLoaded && (commandType == CommandType.LIST || commandType == CommandType.FIND)) {
+                return formatError("your tasks are unavailable because the data file could not be loaded. "
+                        + "Back up and repair the file, then restart Sheppy.");
+            }
             return commandType.changesTasks()
                     ? executeChange(commandType, command)
                     : executeCommand(commandType, command);
@@ -111,6 +119,9 @@ public class Sheppy {
         }
         TaskList.Snapshot snapshot = tasks.snapshot();
         try {
+            if (commandType == CommandType.SORT && tasks.size() == 0) {
+                return "Nothing to sort yet. " + EMPTY_LIST_MESSAGE;
+            }
             String response = executeCommand(commandType, command);
             storage.save(tasks);
             return response;
@@ -198,7 +209,7 @@ public class Sheppy {
                 .mapToObj(index -> (index + 1) + "." + displayedTasks.get(index))
                 .collect(Collectors.joining(lineSeparator));
         return formattedTasks.isEmpty()
-                ? heading
+                ? heading + lineSeparator + EMPTY_LIST_MESSAGE
                 : heading + lineSeparator + formattedTasks;
     }
 

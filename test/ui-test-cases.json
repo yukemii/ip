@@ -1,5 +1,10 @@
 [
   {
+    "name": "Empty list recovery",
+    "input": ["list", "sort", "todo book", "delete 1", "list", "mark 1", "todo new task", "list", "bye"],
+    "expected": ["Your meadow is empty! Add a task with todo, deadline, or event.", "Nothing to sort yet.", "Now you have 0 tasks in the list.", "Baa-error: that task number is not in your list.", "1.[T][ ] new task"]
+  },
+  {
     "name": "Search with no matches",
     "input": ["find pineapple", "todo read book", "find pineapple", "find book", "bye"],
     "expected": ["No matching tasks found. Try another keyword!", "Here are the matching tasks in your list:\n1.[T][ ] read book"]
@@ -101,7 +106,7 @@
     "input": ["list", "bye"],
     "expected": [
       "Baa-error: your task file contains an unknown task type: X",
-      "Here are the tasks in your list:"
+      "Baa-error: your tasks are unavailable"
     ]
   },
   {
@@ -110,7 +115,7 @@
     "input": ["list", "bye"],
     "expected": [
       "Baa-error: your task file contains an invalid status: 2",
-      "Here are the tasks in your list:"
+      "Baa-error: your tasks are unavailable"
     ]
   },
   {
@@ -119,7 +124,7 @@
     "input": ["list", "bye"],
     "expected": [
       "Baa-error: your task file contains the wrong number of fields.",
-      "Here are the tasks in your list:"
+      "Baa-error: your tasks are unavailable"
     ]
   },
   {
@@ -172,8 +177,8 @@
     "name": "C-Sort handles an empty list",
     "input": ["sort", "list", "bye"],
     "expected": [
-      "All sorted! Here are your tasks in alphabetical order:",
-      "Here are the tasks in your list:"
+      "Nothing to sort yet. Your meadow is empty!",
+      "Here are the tasks in your list:\nYour meadow is empty!"
     ]
   }
 ]
