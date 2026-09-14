@@ -13,6 +13,19 @@ class CommandSequenceTest {
     @TempDir
     private Path directory;
 
+    /** Explains empty search results while preserving tasks and successful searches. */
+    @Test
+    void missingKeyword_returnsHelpfulMessage() {
+        Sheppy app = new Sheppy(directory.resolve("search.txt").toString());
+        String expected = "No matching tasks found. Try another keyword!";
+        assertEquals(expected, app.getResponse("find pineapple"));
+        app.getResponse("todo read book");
+        String before = app.getResponse("list");
+        assertEquals(expected, app.getResponse("find pineapple"));
+        assertEquals(before, app.getResponse("list"));
+        assertTrue(app.getResponse("find book").contains("1.[T][ ] read book"));
+    }
+
     /** Verifies numbering, search, completion and deletion after sorting. */
     @Test
     void mixedCommands_preserveExpectedStateAcrossRestart() {

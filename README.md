@@ -1,11 +1,13 @@
 # Sheppy
 
-Sheppy is a small command-line task manager written in Java 25.
+Sheppy is a Java 25 task manager with a JavaFX chat window and an optional console interface.
+
+See the [User Guide](docs/README.md) for setup, command examples, saving and troubleshooting.
 
 ## Running with Gradle
 
 This project uses Gradle's standard Java layout. The application entry point is
-`sheppy.Sheppy`.
+`sheppy.gui.Launcher`. The console entry point is `sheppy.Sheppy`.
 
 Use the included Gradle Wrapper so the project downloads and uses the pinned
 Gradle version automatically:
@@ -15,8 +17,10 @@ Gradle version automatically:
 ./gradlew run
 ```
 
-The `run` task keeps the terminal connected to Sheppy's input. Type commands
-such as `list` or `bye` as usual.
+The `run` task opens the GUI. Enter commands in the window and press Enter or
+click Send. Gradle stays running until the window closes; this is normal.
+For the console interface, run `./gradlew classes`, then
+`java -cp build/classes/java/main sheppy.Sheppy`.
 
 ## Commands
 
@@ -37,14 +41,14 @@ Saving requires a filesystem that supports atomic replacement of files.
 - `delete NUMBER` removes a task.
 - `bye` exits Sheppy.
 
-Useful tasks include:
+## Build and test tasks
 
 ```bash
 ./gradlew tasks     # list available tasks
 ./gradlew build     # compile, test, and assemble the project
 ./gradlew test      # run unit tests
 ./gradlew checkstyleMain checkstyleTest # check Java coding style
-./gradlew jar       # create build/libs/sheppy-1.0.jar
+./gradlew shadowJar # create build/libs/sheppy.jar, including JavaFX
 ./gradlew clean     # remove generated build output
 ```
 
@@ -70,17 +74,34 @@ so that everyone uses the same Gradle version.
 Create the JAR with:
 
 ```bash
-./gradlew jar
+./gradlew clean shadowJar
 ```
 
-Gradle places it at `build/libs/sheppy-1.0.jar`. To run it directly:
+Gradle places the fat JAR at `build/libs/sheppy.jar`. With Java 25, run it directly:
 
 ```bash
-java -jar build/libs/sheppy-1.0.jar
+java -jar build/libs/sheppy.jar
 ```
 
 The JAR can also be copied into an empty folder and run there. Sheppy will
 create its relative `data/tasks.txt` file in that folder when it saves tasks.
+The ordinary `jar` task creates a thin JAR without JavaFX dependencies; use
+`shadowJar` for distribution. Test the fat JAR on each intended OS before release.
+The fat JAR includes native libraries for Windows/Linux x64 and both Intel and
+Apple Silicon Macs. On Macs without JavaFX installed, the launcher extracts the
+matching native libraries to a temporary folder. Other CPU architectures are
+not bundled. A successful run with a JavaFX-enabled JDK alone does not verify
+the packaged libraries; also smoke-test with a plain Java 25 JDK.
+
+## Credits
+
+The project began with the CS2103/T iP starter template; the original
+contributors are retained in [CONTRIBUTORS.md](CONTRIBUTORS.md).
+The JavaFX `MainWindow`/`DialogBox` and FXML organization adapts the approach in
+the [SE-EDU JavaFX tutorial](https://se-education.org/guides/tutorials/javaFxPart4.html).
+Implementation and testing were developed with AI assistance, including Codex.
+The native-library setup follows the search order documented in
+[OpenJFX's native loader](https://github.com/openjdk/jfx/blob/jfx17/modules/javafx.graphics/src/main/java/com/sun/glass/utils/NativeLibLoader.java).
 
 ## Coding conventions
 

@@ -20,6 +20,7 @@ public abstract class Task {
         if (description == null || description.isBlank()) {
             throw new SheppyException("a task description cannot be empty.");
         }
+        validateStorageField(description);
         this.description = description;
         this.isDone = false;
     }
@@ -32,6 +33,30 @@ public abstract class Task {
     /** Marks this task as not done. */
     public void markAsUndone() {
         isDone = false;
+    }
+
+    /**
+     * Returns the task's completion state independently of its display format.
+     *
+     * @return whether the task is complete
+     */
+    public boolean isDone() {
+        return isDone;
+    }
+
+    /**
+     * Rejects characters that cannot round-trip through the line-based storage format.
+     *
+     * @param value the task field to validate
+     * @throws SheppyException if the field contains a separator or a line break
+     */
+    protected static void validateStorageField(String value) throws SheppyException {
+        if (value.contains("|")) {
+            throw new SheppyException("please remove | from task details; it is reserved for saved data.");
+        }
+        if (value.chars().anyMatch(character -> character == '\r' || character == '\n')) {
+            throw new SheppyException("task details must stay on one line.");
+        }
     }
 
     /**

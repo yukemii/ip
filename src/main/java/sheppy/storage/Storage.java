@@ -1,13 +1,17 @@
 package sheppy.storage;
 
 import java.io.IOException;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import sheppy.SheppyException;
 import sheppy.task.Deadline;
@@ -18,6 +22,8 @@ import sheppy.task.Todo;
 
 /** Handles saving and loading Sheppy's tasks from a data file. */
 public class Storage {
+    private static final Logger LOGGER = Logger.getLogger(Storage.class.getName());
+
     /** The path of the file used to store tasks. */
     private final Path filePath;
 
@@ -27,7 +33,7 @@ public class Storage {
      * @param filePath the path of the task data file
      */
     public Storage(String filePath) {
-        this.filePath = Path.of(filePath);
+        this.filePath = Path.of(filePath).toAbsolutePath().normalize();
     }
 
     /**
@@ -39,7 +45,11 @@ public class Storage {
     public void save(TaskList tasks) throws SheppyException {
         Path temporaryFile = null;
         try {
-            Path destination = filePath.toAbsolutePath();
+            Path destination = filePath;
+            if (Files.isSymbolicLink(destination)) {
+                throw new SheppyException("I couldn't save your tasks: the data file is a symbolic link. "
+                        + "Use a regular file to avoid replacing the link.");
+            }
             Files.createDirectories(destination.getParent());
             List<String> lines = tasks.asList().stream()
                     .map(Task::toStorageString)
@@ -48,16 +58,14 @@ public class Storage {
             Files.write(temporaryFile, lines);
             Files.move(temporaryFile, destination, StandardCopyOption.ATOMIC_MOVE,
                     StandardCopyOption.REPLACE_EXISTING);
+        } catch (AtomicMoveNotSupportedException exception) {
+            throw new SheppyException("I couldn't save your tasks: this location does not support safe file "
+                    + "replacement. Move Sheppy to a local folder and try again.", exception);
         } catch (IOException exception) {
-            throw new SheppyException("I couldn't save your tasks: " + exception.getMessage());
+            throw new SheppyException("I couldn't save your tasks to " + filePath + ": "
+                    + exception.getMessage(), exception);
         } finally {
-            if (temporaryFile != null) {
-                try {
-                    Files.deleteIfExists(temporaryFile);
-                } catch (IOException exception) {
-                    // A leftover temporary file is safer than risking the original task file.
-                }
-            }
+            deleteTemporaryFile(temporaryFile);
         }
     }
 
@@ -68,21 +76,48 @@ public class Storage {
      * @throws SheppyException if the file cannot be read or contains invalid data
      */
     public TaskList load() throws SheppyException {
-        List<Task> tasks = new ArrayList<>();
-        if (!Files.exists(filePath)) {
-            return new TaskList(tasks);
-        }
-
         try {
-            for (String line : Files.readAllLines(filePath)) {
-                if (!line.isBlank()) {
-                    tasks.add(parseStoredTask(line));
-                }
+            return parseStoredLines(Files.readAllLines(filePath));
+        } catch (NoSuchFileException exception) {
+            if (Files.isSymbolicLink(filePath)) {
+                throw new SheppyException("I couldn't load your tasks: the data file is a broken symbolic link.",
+                        exception);
             }
+            return new TaskList();
         } catch (IOException exception) {
-            throw new SheppyException("I couldn't load your tasks: " + exception.getMessage());
+            throw new SheppyException("I couldn't load your tasks from " + filePath + ": "
+                    + exception.getMessage(), exception);
+        }
+    }
+
+    /** Validates every record, reporting its location without returning a partial list. */
+    private TaskList parseStoredLines(List<String> lines) throws SheppyException {
+        List<Task> tasks = new ArrayList<>();
+        for (int index = 0; index < lines.size(); index++) {
+            String line = lines.get(index);
+            if (line.isBlank()) {
+                continue;
+            }
+            try {
+                tasks.add(parseStoredTask(line));
+            } catch (SheppyException exception) {
+                throw new SheppyException(exception.getMessage() + " (line " + (index + 1)
+                        + " in " + filePath + ")", exception);
+            }
         }
         return new TaskList(tasks);
+    }
+
+    /** Cleans up failed saves without hiding the original failure. */
+    private void deleteTemporaryFile(Path temporaryFile) {
+        if (temporaryFile == null) {
+            return;
+        }
+        try {
+            Files.deleteIfExists(temporaryFile);
+        } catch (IOException exception) {
+            LOGGER.log(Level.WARNING, "Could not remove temporary task file " + temporaryFile, exception);
+        }
     }
 
     /** Parses one task line from the storage format. */

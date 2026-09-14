@@ -4,6 +4,10 @@ import java.util.Scanner;
 
 /** Handles Sheppy's interaction with the user. */
 public class Ui {
+    /** The greeting shared by the console and graphical interfaces. */
+    public static final String WELCOME_MESSAGE = "Baa-hello! I'm Sheppy, your woolly little helper.\n"
+            + "What shall we graze on today?";
+
     /** Reads commands from standard input. */
     private final Scanner scanner = new Scanner(System.in);
 
@@ -20,8 +24,7 @@ public class Ui {
                 + "  |      your woolly helper        |\n"
                 + "  +--------------------------------+\n";
         System.out.println(banner);
-        System.out.println("Baa-hello! I'm Sheppy, your woolly little helper.");
-        System.out.println("What shall we graze on today?");
+        System.out.println(WELCOME_MESSAGE);
     }
 
     /**
