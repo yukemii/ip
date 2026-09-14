@@ -5,6 +5,7 @@ import json
 import pathlib
 import subprocess
 import sys
+import tempfile
 
 
 def main() -> int:
@@ -17,23 +18,21 @@ def main() -> int:
     subprocess.run([str(root / "gradlew"), "classes"], cwd=root, check=True)
     classes = root / "build/classes/java/main"
 
-    data_file = root / "data/tasks.txt"
-    saved_data = data_file.read_bytes() if data_file.exists() else None
-    try:
-        for case in cases:
-            if data_file.exists():
-                data_file.unlink()
+    for case in cases:
+        with tempfile.TemporaryDirectory(prefix="sheppy-ui-") as case_directory:
+            data_file = pathlib.Path(case_directory) / "data/tasks.txt"
             if "storage" in case:
                 data_file.parent.mkdir(parents=True, exist_ok=True)
-                data_file.write_text("\n".join(case["storage"]) + "\n")
+                data_file.write_text("\n".join(case["storage"]) + "\n", encoding="utf-8")
             input_text = "\n".join(case["input"]) + "\n"
             result = subprocess.run(
                 ["java", "-cp", str(classes), "sheppy.Sheppy"],
-                cwd=root,
+                cwd=case_directory,
                 input=input_text,
                 text=True,
                 capture_output=True,
                 check=True,
+                timeout=15,
             )
             print(f"--- {case['name']} ---")
             print(f"input: {input_text.rstrip()}")
@@ -43,13 +42,6 @@ def main() -> int:
                 print(f"FAIL: missing expected output: {missing}", file=sys.stderr)
                 return 1
             print("PASS")
-    finally:
-        if saved_data is None:
-            if data_file.exists():
-                data_file.unlink()
-        else:
-            data_file.parent.mkdir(parents=True, exist_ok=True)
-            data_file.write_bytes(saved_data)
     return 0
 
 

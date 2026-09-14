@@ -23,6 +23,8 @@ public class Event extends Task {
         if (from == null || from.isBlank() || to == null || to.isBlank()) {
             throw new SheppyException("an event needs non-empty /from and /to times.");
         }
+        validateStorageField(from);
+        validateStorageField(to);
         this.from = from;
         this.to = to;
     }

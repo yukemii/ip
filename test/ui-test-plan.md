@@ -1,5 +1,15 @@
 # Sheppy UI test plan
 
+## Finalization regression checks
+
+- Each CLI test runs in its own temporary working directory; real task data is never touched.
+- Failed saves must restore completed and incomplete tasks, list order, and membership.
+- Model constructors must reject pipes and line breaks so every task can be saved safely.
+- A malformed saved record reports its file path and line number; the file remains unchanged.
+- GUI manual check: after `bye`, Send and the input field stay disabled until the window closes.
+- GUI manual check: long messages wrap at the smallest supported window size without clipping.
+- Both UIs share the same welcome text. Counts say `1 task` and `2 tasks`.
+
 ## More automated testing
 
 - JUnit covers model validation and serialization, parser boundaries, all task types,
@@ -89,6 +99,9 @@ The cases in `test/ui-test-cases.json` are run with the project-specific
   `yyyy-MM-dd`.
 
 ## Level 9 find
+
+- No matches: `find pineapple` on an empty or nonmatching list displays
+  `No matching tasks found. Try another keyword!` and does not change tasks.
 
 - Aim: find tasks whose descriptions contain a keyword.
 - Input: add tasks containing and not containing `book`, then run `find book`.

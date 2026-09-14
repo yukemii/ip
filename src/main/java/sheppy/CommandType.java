@@ -33,5 +33,17 @@ public enum CommandType {
     DELETE,
 
     /** An unrecognized command. */
-    UNKNOWN
+    UNKNOWN;
+
+    /**
+     * Identifies commands that need a successful save before they take effect.
+     *
+     * @return whether the command changes the task list
+     */
+    public boolean changesTasks() {
+        return switch (this) {
+            case TODO, DEADLINE, EVENT, MARK, UNMARK, DELETE, SORT -> true;
+            default -> false;
+        };
+    }
 }

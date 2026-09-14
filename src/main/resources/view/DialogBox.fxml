@@ -13,7 +13,7 @@
     <children>
         <Label fx:id="avatar" alignment="CENTER" minHeight="46.0" minWidth="46.0"
                prefHeight="46.0" prefWidth="46.0" styleClass="avatar" />
-        <Label fx:id="dialogText" maxWidth="520.0" minHeight="46.0"
+        <Label fx:id="dialogText" maxWidth="520.0" minWidth="0.0" minHeight="-Infinity"
                styleClass="dialog-bubble" wrapText="true" HBox.hgrow="ALWAYS">
             <padding>
                 <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />

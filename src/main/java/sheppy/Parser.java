@@ -2,6 +2,7 @@ package sheppy;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
 
 import sheppy.task.Deadline;
 import sheppy.task.Event;
@@ -24,28 +25,21 @@ public class Parser {
         assert command != null : "Command to parse must not be null";
         command = normalize(command);
 
-        if (command.equals("bye")) {
-            return CommandType.BYE;
-        } else if (command.equals("list")) {
-            return CommandType.LIST;
-        } else if (command.equals("find") || command.startsWith("find ")) {
-            return CommandType.FIND;
-        } else if (command.equals("sort")) {
-            return CommandType.SORT;
-        } else if (command.equals("mark") || command.startsWith("mark ")) {
-            return CommandType.MARK;
-        } else if (command.equals("unmark") || command.startsWith("unmark ")) {
-            return CommandType.UNMARK;
-        } else if (command.equals("delete") || command.startsWith("delete ")) {
-            return CommandType.DELETE;
-        } else if (command.equals("todo") || command.startsWith("todo ")) {
-            return CommandType.TODO;
-        } else if (command.equals("deadline") || command.startsWith("deadline ")) {
-            return CommandType.DEADLINE;
-        } else if (command.equals("event") || command.startsWith("event ")) {
-            return CommandType.EVENT;
-        }
-        return CommandType.UNKNOWN;
+        String[] parts = command.split(" ", 2);
+        boolean hasArguments = parts.length > 1;
+        return switch (parts[0]) {
+            case "bye" -> hasArguments ? CommandType.UNKNOWN : CommandType.BYE;
+            case "list" -> hasArguments ? CommandType.UNKNOWN : CommandType.LIST;
+            case "sort" -> hasArguments ? CommandType.UNKNOWN : CommandType.SORT;
+            case "find" -> CommandType.FIND;
+            case "mark" -> CommandType.MARK;
+            case "unmark" -> CommandType.UNMARK;
+            case "delete" -> CommandType.DELETE;
+            case "todo" -> CommandType.TODO;
+            case "deadline" -> CommandType.DEADLINE;
+            case "event" -> CommandType.EVENT;
+            default -> CommandType.UNKNOWN;
+        };
     }
 
     /**
@@ -166,7 +160,7 @@ public class Parser {
 
     /** Rejects repeated date/time markers rather than treating them as task text. */
     private static void requireSingleMarker(String details, String marker) throws SheppyException {
-        long count = java.util.Arrays.stream(details.split(" "))
+        long count = Arrays.stream(details.split(" "))
                 .filter(marker::equals).count();
         if (count != 1) {
             throw new SheppyException("use " + marker + " exactly once.");

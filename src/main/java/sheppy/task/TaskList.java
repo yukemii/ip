@@ -116,6 +116,41 @@ public class TaskList {
                 .thenComparing(Task::getDescription));
     }
 
+    /**
+     * Captures task membership, order and completion states before a change.
+     *
+     * @return a snapshot that can restore this list if the change cannot be saved
+     */
+    public Snapshot snapshot() {
+        return new Snapshot();
+    }
+
+    /** Remembers a list's mutable state without copying immutable task details. */
+    public final class Snapshot {
+        private final List<TaskState> states = tasks.stream()
+                .map(task -> new TaskState(task, task.isDone())).toList();
+
+        private Snapshot() {
+        }
+
+        /** Restores the original order, membership and completion states. */
+        public void restore() {
+            tasks.clear();
+            for (TaskState state : states) {
+                if (state.done()) {
+                    state.task().markAsDone();
+                } else {
+                    state.task().markAsUndone();
+                }
+                tasks.add(state.task());
+            }
+        }
+    }
+
+    /** Captures the only mutable property of a task alongside the task itself. */
+    private record TaskState(Task task, boolean done) {
+    }
+
     /** Converts a user-facing one-based number into an internal index. */
     private int toIndex(int taskNumber) throws SheppyException {
         if (taskNumber < 1 || taskNumber > tasks.size()) {

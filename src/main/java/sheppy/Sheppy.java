@@ -1,6 +1,5 @@
 package sheppy;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -18,7 +17,10 @@ public class Sheppy {
     private final Storage storage;
 
     /** Contains the tasks in the current session. */
-    private TaskList tasks;
+    private final TaskList tasks;
+
+    /** Prevents overwriting a file that failed to load. */
+    private final boolean storageLoaded;
 
     /** Contains a loading error to show after startup, or an empty string. */
     private final String startupMessage;
@@ -46,6 +48,7 @@ public class Sheppy {
         }
         tasks = loadedTasks;
         startupMessage = loadingMessage;
+        storageLoaded = loadingMessage.isEmpty();
     }
 
     /**
@@ -86,43 +89,50 @@ public class Sheppy {
      * @return Sheppy's response, including any validation error
      */
     public String getResponse(String command) {
-        List<Task> previousTasks = new ArrayList<>(tasks.asList());
-        List<String> previousStatuses = previousTasks.stream().map(Task::getStatusIcon).toList();
         try {
             command = Parser.normalize(command);
             if (command.isEmpty()) {
                 throw new SheppyException("please enter a command, such as list.");
             }
             CommandType commandType = Parser.parseCommand(command);
-            if (!startupMessage.isEmpty() && commandType != CommandType.LIST
-                    && commandType != CommandType.FIND && commandType != CommandType.BYE
-                    && commandType != CommandType.UNKNOWN) {
-                throw new SheppyException("your data could not be loaded. Back up and repair the data file, "
-                        + "then restart Sheppy before changing tasks.");
-            }
-            return switch (commandType) {
-                case BYE -> "Baa-bye! Keep your thoughts cozy and your tasks tidy.";
-                case LIST -> formatTasks("Here are the tasks in your list:", tasks.asList());
-                case FIND -> formatTasks("Here are the matching tasks in your list:",
-                        tasks.find(Parser.parseFindKeyword(command)));
-                case SORT -> sortTasks();
-                case MARK -> updateTaskStatus(command, true);
-                case UNMARK -> updateTaskStatus(command, false);
-                case DELETE -> deleteTask(command);
-                case TODO, DEADLINE, EVENT -> addTask(Parser.parseTask(command));
-                case UNKNOWN -> throw Parser.unknownCommand();
-            };
+            return commandType.changesTasks()
+                    ? executeChange(commandType, command)
+                    : executeCommand(commandType, command);
         } catch (SheppyException exception) {
-            tasks = new TaskList(previousTasks);
-            for (int index = 0; index < previousTasks.size(); index++) {
-                if (previousStatuses.get(index).equals("X")) {
-                    previousTasks.get(index).markAsDone();
-                } else {
-                    previousTasks.get(index).markAsUndone();
-                }
-            }
             return formatError(exception.getMessage());
         }
+    }
+
+    /** Executes and saves a change, restoring its snapshot if either operation fails. */
+    private String executeChange(CommandType commandType, String command) throws SheppyException {
+        if (!storageLoaded) {
+            throw new SheppyException("your data could not be loaded. Back up and repair the data file, "
+                    + "then restart Sheppy before changing tasks.");
+        }
+        TaskList.Snapshot snapshot = tasks.snapshot();
+        try {
+            String response = executeCommand(commandType, command);
+            storage.save(tasks);
+            return response;
+        } catch (SheppyException exception) {
+            snapshot.restore();
+            throw exception;
+        }
+    }
+
+    /** Dispatches a validated command to the operation responsible for it. */
+    private String executeCommand(CommandType commandType, String command) throws SheppyException {
+        return switch (commandType) {
+            case BYE -> "Baa-bye! Keep your thoughts cozy and your tasks tidy.";
+            case LIST -> formatTasks("Here are the tasks in your list:", tasks.asList());
+            case FIND -> findTasks(command);
+            case SORT -> sortTasks();
+            case MARK -> updateTaskStatus(command, true);
+            case UNMARK -> updateTaskStatus(command, false);
+            case DELETE -> deleteTask(command);
+            case TODO, DEADLINE, EVENT -> addTask(Parser.parseTask(command));
+            case UNKNOWN -> throw Parser.unknownCommand();
+        };
     }
 
     /**
@@ -135,41 +145,50 @@ public class Sheppy {
         return Parser.parseCommand(command) == CommandType.BYE;
     }
 
-    /** Adds a task, saves the updated list, and returns a confirmation. */
-    private String addTask(Task task) throws SheppyException {
+    /** Adds a task and returns a confirmation for the pending change. */
+    private String addTask(Task task) {
         tasks.add(task);
-        storage.save(tasks);
         return "Got it. I've added this task:\n"
                 + "  " + task + "\n"
-                + "Now you have " + tasks.size() + " tasks in the list.";
+                + formatTaskCount();
     }
 
-    /** Updates a task's completion status, saves it, and returns a confirmation. */
+    /** Updates a task's completion status and returns a confirmation. */
     private String updateTaskStatus(String command, boolean markDone) throws SheppyException {
         int taskNumber = Parser.parseTaskNumber(command);
         Task task = tasks.updateStatus(taskNumber, markDone);
-        storage.save(tasks);
         String confirmation = markDone
                 ? "Nice! I've marked this task as done:"
                 : "OK, I've marked this task as not done yet:";
         return confirmation + "\n  " + task;
     }
 
-    /** Deletes a task, saves the updated list, and returns a confirmation. */
+    /** Deletes a task and returns a confirmation. */
     private String deleteTask(String command) throws SheppyException {
         int taskNumber = Parser.parseTaskNumber(command);
         Task deletedTask = tasks.remove(taskNumber);
-        storage.save(tasks);
         return "Noted. I've removed this task:\n"
                 + "  " + deletedTask + "\n"
-                + "Now you have " + tasks.size() + " tasks in the list.";
+                + formatTaskCount();
     }
 
-    /** Sorts tasks alphabetically, saves the new order, and returns the sorted list. */
-    private String sortTasks() throws SheppyException {
+    /** Displays matching tasks or explains that the search returned no matches. */
+    private String findTasks(String command) throws SheppyException {
+        List<Task> matches = tasks.find(Parser.parseFindKeyword(command));
+        return matches.isEmpty()
+                ? "No matching tasks found. Try another keyword!"
+                : formatTasks("Here are the matching tasks in your list:", matches);
+    }
+
+    /** Sorts tasks alphabetically and returns the sorted list. */
+    private String sortTasks() {
         tasks.sortByDescription();
-        storage.save(tasks);
         return formatTasks("All sorted! Here are your tasks in alphabetical order:", tasks.asList());
+    }
+
+    /** Formats the task count using the appropriate singular or plural noun. */
+    private String formatTaskCount() {
+        return "Now you have " + tasks.size() + (tasks.size() == 1 ? " task" : " tasks") + " in the list.";
     }
 
     /** Formats a numbered collection of tasks under a heading. */
